@@ -3,6 +3,7 @@ package port
 type Repository interface {
 	AuditLogRepository
 	UserRepository
+	CategoryRepository
 	BookRepository
 	FineRepository
 	BorrowRepository
@@ -11,6 +12,7 @@ type Repository interface {
 type Service interface {
 	AuditLogService
 	UserService
+	CategoryService
 	BookService
 	FineService
 	BorrowService

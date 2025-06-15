@@ -60,6 +60,15 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		user.DELETE("/:id", handler.DeleteUser)
 	}
 
+	category := v1.Group("/categories")
+	{
+		category.POST("", handler.CreateCategory)
+		category.GET("", handler.ListCategory)
+		category.GET("/:id", handler.GetCategory)
+		category.PUT("/:id", handler.UpdateCategory)
+		category.DELETE("/:id", handler.DeleteCategory)
+	}
+
 	auditlog := v1.Group("/auditlog")
 	{
 		auditlog.POST("", handler.CreateAuditLog)
