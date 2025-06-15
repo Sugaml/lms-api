@@ -74,7 +74,6 @@ type UserResponse struct {
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	Username  string    `json:"username"`
-	Password  string    `json:"password"`
 	Role      string    `json:"role"`
 	Email     string    `json:"email"`
 	FullName  string    `json:"full_name"`

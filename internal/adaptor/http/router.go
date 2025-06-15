@@ -54,6 +54,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	user := v1.Group("/users")
 	{
 		user.POST("", handler.CreateUser)
+		user.POST("/login", handler.LoginUser)
 		user.GET("", handler.ListUser)
 		user.GET("/:id", handler.GetUser)
 		user.PUT("", handler.UpdateUser)
