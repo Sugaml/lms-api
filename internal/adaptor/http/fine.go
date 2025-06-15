@@ -85,7 +85,7 @@ func (h *Handler) GetFine(ctx *gin.Context) {
 // @Produce  			json
 // @Security 			ApiKeyAuth
 // @Param 				id 							path 		string 								true 	"Fine id"
-// @Param 				FineUpdateRequest	 		body 		domain.FineUpdateRequest 	true 	"Update Fine Response request"
+// @Param 				FineUpdateRequest	 		body 		domain.UpdateFineRequest 	true 	"Update Fine Response request"
 // @Success 			200 						{object} 	domain.FineResponse
 // @Router 				/fines/{id} 				[put]
 func (h *Handler) UpdateFine(ctx *gin.Context) {

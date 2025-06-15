@@ -15,8 +15,8 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			BorrowRequest			body		domain.BorrowRequest		true		"Add Borrow Request"
-// @Success			200					{object}	domain.BorrowResponse					"Borrow created"
+// @Param			BorrowRequest			body	domain.BorrowedBookRequest		true		"Add Borrow Request"
+// @Success			200					{object}	domain.BorrowedBookResponse					"Borrow created"
 // @Router			/borrows 				[post]
 func (h *Handler) CreateBorrow(ctx *gin.Context) {
 	var req *domain.BorrowedBookRequest
@@ -40,7 +40,7 @@ func (h *Handler) CreateBorrow(ctx *gin.Context) {
 // @Produce  		json
 // @Security 		ApiKeyAuth
 // @Param 			query 						query 		string 		false 	"query"
-// @Success 		200 		{array} 		domain.BorrowResponse
+// @Success 		200 		{array} 		domain.BorrowedBookResponse
 // @Router 			/borrows	 	[get]
 func (h *Handler) ListBorrow(ctx *gin.Context) {
 	var req domain.ListBorrowedBookRequest
@@ -65,7 +65,7 @@ func (h *Handler) ListBorrow(ctx *gin.Context) {
 // @Produce  		json
 // @Security 		ApiKeyAuth
 // @Param 			id path string true "Borrow id"
-// @Success 		200 {object} domain.BorrowResponse
+// @Success 		200 {object} domain.BorrowedBookResponse
 // @Router 			/borrows/{id} [get]
 func (h *Handler) GetBorrow(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -85,8 +85,8 @@ func (h *Handler) GetBorrow(ctx *gin.Context) {
 // @Produce  			json
 // @Security 			ApiKeyAuth
 // @Param 				id 							path 		string 								true 	"Borrow id"
-// @Param 				BorrowUpdateRequest	 		body 		domain.BorrowUpdateRequest 	true 	"Update Borrow Response request"
-// @Success 			200 						{object} 	domain.BorrowResponse
+// @Param 				BorrowUpdateRequest	 		body 		domain.UpdateBorrowedBookRequest 	true 	"Update Borrow Response request"
+// @Success 			200 						{object} 	domain.BorrowedBookResponse
 // @Router 				/borrows/{id} 				[put]
 func (h *Handler) UpdateBorrow(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -112,7 +112,7 @@ func (h *Handler) UpdateBorrow(ctx *gin.Context) {
 // @Security 			ApiKeyAuth
 // @Security 			BorrowAuth
 // @Param 				id 						path 		string 						true 	"Borrow id"
-// @Success 			200 					{object} 	domain.BorrowResponse
+// @Success 			200 					{object} 	domain.BorrowedBookResponse
 // @Router 				/borrows/{id} 	[delete]
 func (ch *Handler) DeleteBorrow(ctx *gin.Context) {
 	id := ctx.Param("id")
