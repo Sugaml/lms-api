@@ -22,6 +22,17 @@ type BorrowedBook struct {
 	Book         *Book      `gorm:"foreignkey:ID;references:BookID" json:"book"`
 }
 
+type BorrowBookResponse struct {
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+
+type BorrowStudentResponse struct {
+	FullName  string `json:"full_name"`
+	Program   string `json:"program"`
+	StudentID string `json:"student_id"`
+}
+
 type BorrowedBookRequest struct {
 	UserID       string     `json:"user_id"`
 	BookID       string     `json:"book_id"`
@@ -55,20 +66,20 @@ type ListBorrowedBookRequest struct {
 }
 
 type BorrowedBookResponse struct {
-	ID           string        `json:"id"`
-	CreatedAt    time.Time     `json:"created_at"`
-	UserID       string        `json:"user_id"`
-	BookID       string        `json:"book_id"`
-	LibrarianID  string        `json:"librarian_id"`
-	BorrowedDate time.Time     `json:"borrowed_date"`
-	DueDate      time.Time     `json:"due_date"`
-	ReturnedDate *time.Time    `json:"returned_date"`
-	RenewalCount int           `json:"renewal_count"`
-	Status       string        `json:"status"` // 'borrowed' | 'returned' | 'overdue'
-	Student      *UserResponse `json:"student"`
-	Librarian    *UserResponse `json:"librarian"`
-	Book         *BookResponse `json:"book"`
-	Remarks      string        `json:"remarks"`
+	ID           string                 `json:"id"`
+	CreatedAt    time.Time              `json:"created_at"`
+	UserID       string                 `json:"user_id"`
+	BookID       string                 `json:"book_id"`
+	LibrarianID  string                 `json:"librarian_id"`
+	BorrowedDate time.Time              `json:"borrowed_date"`
+	DueDate      time.Time              `json:"due_date"`
+	ReturnedDate *time.Time             `json:"returned_date"`
+	RenewalCount int                    `json:"renewal_count"`
+	Status       string                 `json:"status"` // 'borrowed' | 'returned' | 'overdue'
+	Student      *BorrowStudentResponse `json:"student"`
+	Librarian    *UserResponse          `json:"librarian"`
+	Book         *BorrowBookResponse    `json:"book"`
+	Remarks      string                 `json:"remarks"`
 }
 
 func (r BorrowedBookRequest) Validate() error {

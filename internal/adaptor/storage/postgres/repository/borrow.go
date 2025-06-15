@@ -59,16 +59,6 @@ func (r *Repository) GetBorrow(id string) (*domain.BorrowedBook, error) {
 	return &data, nil
 }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-// GetBookBorrowByUserID retrieves all borrowed books by user id.
-//
-// Args:
-// user_id: User ID.
-//
-// Returns:
-// []*domain.BorrowedBook: Slice of BorrowedBooks.
-
-/*******  f1ff6409-449b-4839-94f2-1a5044577c22  *******/
 func (r *Repository) GetBookBorrowByUserID(user_id string) ([]*domain.BorrowedBook, error) {
 	var data []*domain.BorrowedBook
 	if err := r.db.Model(&domain.BorrowedBook{}).
