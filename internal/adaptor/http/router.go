@@ -1,9 +1,7 @@
 package http
 
 import (
-	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/adaptor/config"
 	"github.com/sugaml/lms-api/internal/core/port"
 
@@ -37,15 +35,6 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	// setup Sentry
-	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:              config.SENTRY_DSN,
-		EnableTracing:    true,
-		TracesSampleRate: 1.0,
-		ServerName:       config.APP_ENV + "-lms",
-	}); err != nil {
-		logrus.Error("Sentry initialization failed:", "error", err)
-	}
 	router := gin.Default()
 
 	v1 := router.Group("/api/v1/lms")
@@ -57,11 +46,31 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	// Set Middileware
 	v1.Use(extractUserInfo())
 
-	user := v1.Group("/user")
+	user := v1.Group("/users")
 	{
 		user.POST("", handler.CreateUser)
-		user.GET("", handler.GetUser)
+		user.GET("", handler.ListUser)
+		user.GET("/:id", handler.GetUser)
 		user.PUT("", handler.UpdateUser)
+		user.DELETE("/:id", handler.DeleteUser)
+	}
+
+	auditlog := v1.Group("/auditlog")
+	{
+		auditlog.POST("", handler.CreateAuditLog)
+		auditlog.GET("", handler.ListAuditLog)
+		auditlog.GET("/:id", handler.GetAuditLog)
+		auditlog.PUT("/:id", handler.UpdateAuditLog)
+		auditlog.DELETE("/:id", handler.DeleteAuditLog)
+	}
+
+	book := v1.Group("/books")
+	{
+		book.POST("", handler.CreateBook)
+		book.GET("", handler.ListBook)
+		book.GET("/:id", handler.GetBook)
+		book.PUT("", handler.UpdateBook)
+		book.DELETE("/:id", handler.DeleteBook)
 	}
 
 	return &Router{

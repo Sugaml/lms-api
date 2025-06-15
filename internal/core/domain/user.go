@@ -105,6 +105,10 @@ type BookRequest struct {
 	ApprovedBy   *int       `gorm:"column:approved_by"`
 }
 
+func (r *BookRequest) Validate() error {
+	return nil
+}
+
 type Notification struct {
 	ID          int       `gorm:"primaryKey;autoIncrement"`
 	UserID      int       `gorm:"not null"`

@@ -17,9 +17,43 @@ type Book struct {
 
 type BookListRequest struct {
 	ListRequest
+	Title           string `json:"title"`
+	Author          string `json:"author"`
+	ISBN            string `json:"isbn"`
+	Category        string `json:"category"`
+	Program         string `json:"program"`
+	TotalCopies     int    `json:"total_copies"`
+	AvailableCopies int    `json:"available_copies"`
+	Description     string `json:"description"`
+	CoverImage      string `json:"cover_image"`
+}
+
+type BookUpdateRequest struct {
+	Title           string `json:"title"`
+	Author          string `json:"author"`
+	ISBN            string `json:"isbn"`
+	Category        string `json:"category"`
+	Program         string `json:"program"`
+	TotalCopies     int    `json:"total_copies"`
+	AvailableCopies int    `json:"available_copies"`
+	Description     string `json:"description"`
+	CoverImage      string `json:"cover_image"`
+}
+
+func (r *BookUpdateRequest) NewUpdate() Map {
+	return nil
 }
 
 type BookAllUpdateRequest struct {
+	Title           string `json:"title"`
+	Author          string `json:"author"`
+	ISBN            string `json:"isbn"`
+	Category        string `json:"category"`
+	Program         string `json:"program"`
+	TotalCopies     int    `json:"total_copies"`
+	AvailableCopies int    `json:"available_copies"`
+	Description     string `json:"description"`
+	CoverImage      string `json:"cover_image"`
 }
 
 type BookResponse struct {

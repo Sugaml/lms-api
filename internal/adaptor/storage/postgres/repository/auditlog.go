@@ -19,9 +19,6 @@ func (r *Repository) ListAuditLog(req *domain.ListAuditLogRequest) ([]*domain.Au
 	if req.Query != "" {
 		f = f.Where("lower(title) LIKE lower(?)", "%"+req.Query+"%")
 	}
-	if req.ParkingAreaID != "" {
-		f = f.Where("parking_area_id = ?", req.ParkingAreaID)
-	}
 	if req.UserID != "" {
 		f = f.Where("user_id = ?", req.UserID)
 	}
