@@ -1,0 +1,97 @@
+package service
+
+import (
+	"errors"
+	"fmt"
+
+	"github.com/sugaml/lms-api/internal/core/domain"
+)
+
+// CreateUser creates a new User
+func (s *Service) CreateUser(req *domain.UserRequest) (*domain.UserResponse, error) {
+	err := req.Validate()
+	if err != nil {
+		return nil, err
+	}
+	data := domain.Convert[domain.UserRequest, domain.User](req)
+	result, err := s.repo.CreateUser(data)
+	if err != nil {
+		return nil, err
+	}
+	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    fmt.Sprintf("Created new User %s.", result.Username),
+		UserID:   &result.ID,
+		Action:   "create",
+		Data:     string(domain.ConvertToJson(result)),
+		IsActive: true,
+	})
+	return domain.Convert[domain.User, domain.UserResponse](result), nil
+}
+
+// ListUsers retrieves a list of Users
+func (s *Service) ListUser(req *domain.UserListRequest) ([]*domain.UserResponse, int64, error) {
+	var datas = []*domain.UserResponse{}
+	results, count, err := s.repo.ListUser(req)
+	if err != nil {
+		return nil, count, err
+	}
+	for _, result := range results {
+		data := domain.Convert[domain.User, domain.UserResponse](result)
+		datas = append(datas, data)
+	}
+	return datas, count, nil
+}
+
+func (s *Service) GetUser(id string) (*domain.UserResponse, error) {
+	result, err := s.repo.GetUser(id)
+	if err != nil {
+		return nil, err
+	}
+	data := domain.Convert[domain.User, domain.UserResponse](result)
+	return data, nil
+}
+
+func (s *Service) UpdateUser(id string, req *domain.UserUpdateRequest) (*domain.UserResponse, error) {
+	if id == "" {
+		return nil, errors.New("required User id")
+	}
+	_, err := s.repo.GetUser(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// update
+	mp := req.NewUpdate()
+	result, err := s.repo.UpdateUser(id, mp)
+	if err != nil {
+		return nil, err
+	}
+	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    fmt.Sprintf("Updated %s User details.", result.Username),
+		UserID:   &result.ID,
+		Action:   "update",
+		Data:     fmt.Sprint(req),
+		IsActive: true,
+	})
+	data := domain.Convert[domain.User, domain.UserResponse](result)
+	return data, nil
+}
+
+func (s *Service) DeleteUser(id string) (*domain.UserResponse, error) {
+	result, err := s.repo.GetUser(id)
+	if err != nil {
+		return nil, err
+	}
+	err = s.repo.DeleteUser(id)
+	if err != nil {
+		return nil, err
+	}
+	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    fmt.Sprintf("Deleted %s parking area.", result.Username),
+		UserID:   &result.ID,
+		Action:   "delete",
+		Data:     fmt.Sprint(result),
+		IsActive: true,
+	})
+	return domain.Convert[domain.User, domain.UserResponse](result), nil
+}
