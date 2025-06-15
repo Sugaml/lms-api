@@ -32,6 +32,30 @@ func (h *Handler) CreateUser(ctx *gin.Context) {
 	SuccessResponse(ctx, result)
 }
 
+// LoginUser		godoc
+// @Summary			Login User
+// @Description		Login User
+// @Tags			User
+// @Accept			json
+// @Produce			json
+// @Security 		ApiKeyAuth
+// @Param			UserRequest			body		domain.LoginRequest		true		"Login User Request"
+// @Success			200					{object}	domain.LoginUserResponse			"LoginUser Reponse"
+// @Router			/users/login 				[post]
+func (h *Handler) LoginUser(ctx *gin.Context) {
+	var req *domain.LoginRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	result, err := h.svc.LoginUser(req)
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	SuccessResponse(ctx, result)
+}
+
 // ListUser 		godoc
 // @Summary 		List User
 // @Description 	List User

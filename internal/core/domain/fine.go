@@ -4,12 +4,13 @@ import "time"
 
 type Fine struct {
 	BaseModel
-	UserID         int        `gorm:"not null"`
-	BorrowedBookID int        `gorm:"column:borrowed_book_id;not null"`
-	Amount         int        `gorm:"not null"` // in paisa
-	Reason         string     `gorm:"not null"`
-	Status         string     `gorm:"not null"` // 'pending' | 'paid'
-	PaidAt         *time.Time `gorm:"column:paid_at"`
+	UserID         int        `gorm:"not null" json:"user_id"`
+	BorrowedBookID int        `gorm:"column:borrowed_book_id;not null" json:"borrowed_book_id"`
+	Amount         int        `gorm:"not null" json:"amount"` // in paisa
+	Reason         string     `gorm:"not null" json:"reason"`
+	Status         string     `gorm:"not null" json:"status"` // 'pending' | 'paid'
+	PaidAt         *time.Time `gorm:"column:paid_at" json:"paid_at"`
+	IsActive       bool       `gorm:"column:is_active;default:false" json:"is_active"`
 }
 
 type FineRequest struct {

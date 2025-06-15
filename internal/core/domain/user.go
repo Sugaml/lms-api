@@ -1,27 +1,31 @@
 // domain/user.go
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type User struct {
 	BaseModel
-	Username  string `gorm:"unique;not null"`
-	Password  string `gorm:"not null"`
-	Role      string `gorm:"not null"`
-	Email     string `gorm:"not null"`
-	FullName  string `gorm:"column:full_name;not null"`
-	Program   string
-	StudentID string `gorm:"column:student_id"`
+	Username  string `gorm:"unique;not null" json:"username"`
+	Password  string `gorm:"not null" json:"password"`
+	Role      string `gorm:"not null" json:"role"`
+	Email     string `gorm:"not null" json:"email"`
+	FullName  string `gorm:"column:full_name;not null" json:"full_name"`
+	Program   string `json:"program"`
+	StudentID string `gorm:"column:student_id" json:"student_id"`
+	IsActive  bool   `gorm:"column:is_active;default:false" json:"is_active"`
 }
 
 type UserRequest struct {
-	Username  string `gorm:"unique;not null"`
-	Password  string `gorm:"not null"`
-	Role      string `gorm:"not null"`
-	Email     string `gorm:"not null"`
-	FullName  string `gorm:"column:full_name;not null"`
-	Program   string
-	StudentID string `gorm:"column:student_id"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Role      string `json:"role"`
+	Email     string `json:"email"`
+	FullName  string `json:"full_name"`
+	Program   string `json:"program"`
+	StudentID string `json:"student_id"`
 }
 
 type UserListRequest struct {
@@ -45,6 +49,17 @@ type UserAllUpdateRequest struct {
 	StudentID string `json:"student_id"`
 }
 
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
+}
+
+type LoginUserResponse struct {
+	AccessToken string `json:"access_token"`
+	User        *UserResponse
+}
+
 type UserUpdateRequest struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
@@ -53,10 +68,6 @@ type UserUpdateRequest struct {
 	FullName  string `json:"full_name"`
 	Program   string `json:"program"`
 	StudentID string `json:"student_id"`
-}
-
-func (r *UserUpdateRequest) NewUpdate() Map {
-	return nil
 }
 
 type UserResponse struct {
@@ -72,9 +83,35 @@ type UserResponse struct {
 }
 
 func (u *UserRequest) Validate() error {
+	if u.Username == "" {
+		return errors.New("username is required")
+	}
+	if u.Password == "" {
+		return errors.New("password is required")
+	}
+	if u.Role == "" {
+		return errors.New("role is required")
+	}
+	if u.Email == "" {
+		return errors.New("email is required")
+	}
+	if u.FullName == "" {
+		return errors.New("full name is required")
+	}
+	if u.Role == "Student" {
+		if u.Program == "" {
+			return errors.New("program is required")
+		}
+		if u.StudentID == "" {
+			return errors.New("student id is required")
+		}
+	}
 	return nil
 }
 
-func (r *BookRequest) Validate() error {
+func (r *UserUpdateRequest) NewUpdate() Map {
+	if r.Username != "" {
+		return Map{"username": r.Username}
+	}
 	return nil
 }

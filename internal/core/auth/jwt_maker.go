@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -24,8 +23,8 @@ func NewJWTMaker(secretKey string) (Maker, error) {
 }
 
 // CreateToken creates a new token for a specific username and duration
-func (maker *JWTMaker) CreateToken(username string, duration time.Duration) (string, error) {
-	payload, err := NewPayload(username, duration)
+func (maker *JWTMaker) CreateToken(username string) (string, error) {
+	payload, err := NewPayload(username)
 	if err != nil {
 		return "", err
 	}

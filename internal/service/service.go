@@ -1,17 +1,23 @@
 package service
 
-import "github.com/sugaml/lms-api/internal/core/port"
+import (
+	"github.com/sugaml/lms-api/internal/core/auth"
+	"github.com/sugaml/lms-api/internal/core/port"
+)
 
 type Service struct {
-	repo port.Repository
+	repo       port.Repository
+	tokenMaker auth.Maker
 }
 
 // NewAnnocuncementService creates a new product service instance
 func NewService(
 	repo port.Repository,
+	tokenMaker auth.Maker,
 ) port.Service {
 	return &Service{
 		repo,
+		tokenMaker,
 	}
 }
 

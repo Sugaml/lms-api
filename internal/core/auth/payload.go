@@ -21,7 +21,7 @@ var (
 )
 
 // NewPayload creates  a new token payload with a specific username and duration
-func NewPayload(username string, duration time.Duration) (*Payload, error) {
+func NewPayload(username string) (*Payload, error) {
 	tokenID, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 		ID:        tokenID,
 		Username:  username,
 		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(duration),
+		ExpiredAt: time.Now().Add(24 * time.Hour),
 	}
 	return payload, nil
 }

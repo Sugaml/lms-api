@@ -1,18 +1,22 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Book struct {
 	BaseModel
-	Title           string `gorm:"not null"`
-	Author          string `gorm:"not null"`
-	ISBN            string `gorm:"unique;not null"`
-	Category        string `gorm:"not null"`
-	Program         string `gorm:"not null"`
-	TotalCopies     int    `gorm:"not null"`
-	AvailableCopies int    `gorm:"not null"`
-	Description     string
-	CoverImage      string `gorm:"column:cover_image"`
+	Title           string `gorm:"not null" json:"title"`
+	Author          string `gorm:"not null" json:"author"`
+	ISBN            string `gorm:"unique;not null" json:"isbn"`
+	Category        string `gorm:"not null" json:"category"`
+	Program         string `gorm:"not null" json:"program"`
+	TotalCopies     int    `gorm:"not null" json:"total_copies"`
+	AvailableCopies int    `gorm:"not null" json:"available_copies"`
+	Description     string `gorm:"not null" json:"description"`
+	CoverImage      string `gorm:"column:cover_image" json:"cover_image"`
+	IsActive        bool   `gorm:"column:is_active;default:false" json:"is_active"`
 }
 
 type BookRequest struct {
@@ -49,10 +53,6 @@ type BookUpdateRequest struct {
 	CoverImage      string `json:"cover_image"`
 }
 
-func (r *BookUpdateRequest) NewUpdate() Map {
-	return nil
-}
-
 type BookAllUpdateRequest struct {
 	Title           string `json:"title"`
 	Author          string `json:"author"`
@@ -77,4 +77,24 @@ type BookResponse struct {
 	AvailableCopies int       `json:"available_copies"`
 	Description     string    `json:"description"`
 	CoverImage      string    `json:"cover_image"`
+}
+
+func (r *BookRequest) Validate() error {
+	if r.UserID == 0 {
+		return errors.New("user id is required")
+	}
+	if r.BookID == 0 {
+		return errors.New("book id is required")
+	}
+	if r.Status == "" {
+		return errors.New("status is required")
+	}
+	if r.RequestDate.IsZero() {
+		return errors.New("request date is required")
+	}
+	return nil
+}
+
+func (r *BookUpdateRequest) NewUpdate() Map {
+	return nil
 }

@@ -4,13 +4,14 @@ import "time"
 
 type BorrowedBook struct {
 	BaseModel
-	UserID       int       `gorm:"not null"`
-	BookID       int       `gorm:"not null"`
-	BorrowedDate time.Time `gorm:"column:borrowed_date;autoCreateTime"`
-	DueDate      time.Time `gorm:"not null"`
-	ReturnedDate *time.Time
-	RenewalCount int    `gorm:"default:0"`
-	Status       string `gorm:"not null"` // 'borrowed' | 'returned' | 'overdue'
+	UserID       int        `gorm:"not null" json:"user_id"`
+	BookID       int        `gorm:"not null" json:"book_id"`
+	BorrowedDate time.Time  `gorm:"column:borrowed_date;autoCreateTime" json:"borrowed_date"`
+	DueDate      time.Time  `gorm:"not null" json:"due_date"`
+	ReturnedDate *time.Time `gorm:"column:returned_date" json:"returned_date"`
+	RenewalCount int        `gorm:"default:0" json:"renewal_count"`
+	Status       string     `gorm:"not null" json:"status"` // 'borrowed' | 'returned' | 'overdue'
+	IsActive     bool       `gorm:"column:is_active;default:false" json:"is_active"`
 }
 
 type BorrowedBookRequest struct {

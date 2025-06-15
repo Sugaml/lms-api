@@ -46,11 +46,11 @@ func main() {
 	}
 
 	repo := repository.NewRepository(db)
-	svc := service.NewService(repo)
 	tokenMaker, err := auth.NewJWTMaker(config.JWT_SECRET)
 	if err != nil {
 		logrus.WithError(err).Fatal("Error initializing token maker")
 	}
+	svc := service.NewService(repo, tokenMaker)
 	handler := http.NewHandler(svc, config, tokenMaker)
 
 	// Init router

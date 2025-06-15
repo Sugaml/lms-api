@@ -34,8 +34,15 @@ func (r *Repository) ListUser(req *domain.UserListRequest) ([]*domain.User, int6
 func (r *Repository) GetUser(id string) (*domain.User, error) {
 	var data domain.User
 	if err := r.db.Model(&domain.User{}).
-		Preload("User").
 		Take(&data, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &data, nil
+}
+func (r *Repository) GetUserbyUsername(username string) (*domain.User, error) {
+	var data domain.User
+	if err := r.db.Model(&domain.User{}).
+		Take(&data, "username = ?", username).Error; err != nil {
 		return nil, err
 	}
 	return &data, nil

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/sugaml/lms-api/internal/core/domain"
+	util "github.com/sugaml/lms-api/internal/core/utils"
 )
 
 // CreateUser creates a new User
@@ -14,6 +15,10 @@ func (s *Service) CreateUser(req *domain.UserRequest) (*domain.UserResponse, err
 		return nil, err
 	}
 	data := domain.Convert[domain.UserRequest, domain.User](req)
+	data.Password, err = util.HashPassword(data.Password)
+	if err != nil {
+		return nil, err
+	}
 	result, err := s.repo.CreateUser(data)
 	if err != nil {
 		return nil, err
@@ -26,6 +31,27 @@ func (s *Service) CreateUser(req *domain.UserRequest) (*domain.UserResponse, err
 		IsActive: true,
 	})
 	return domain.Convert[domain.User, domain.UserResponse](result), nil
+}
+
+func (s *Service) LoginUser(req *domain.LoginRequest) (*domain.LoginUserResponse, error) {
+	user, err := s.repo.GetUserbyUsername(req.Username)
+	if err != nil {
+		return nil, err
+	}
+	err = util.CheckPassword(req.Password, user.Password)
+	if err != nil {
+		return nil, err
+	}
+	accessToken, err := s.tokenMaker.CreateToken(
+		user.Username,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.LoginUserResponse{
+		AccessToken: accessToken,
+		User:        domain.Convert[domain.User, domain.UserResponse](user),
+	}, nil
 }
 
 // ListUsers retrieves a list of Users
@@ -59,7 +85,6 @@ func (s *Service) UpdateUser(id string, req *domain.UserUpdateRequest) (*domain.
 	if err != nil {
 		return nil, err
 	}
-
 	// update
 	mp := req.NewUpdate()
 	result, err := s.repo.UpdateUser(id, mp)

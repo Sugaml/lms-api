@@ -2,11 +2,12 @@ package domain
 
 type Notification struct {
 	BaseModel
-	UserID      int    `gorm:"not null"`
-	Title       string `gorm:"not null"`
-	Description string `gorm:"not null"`
-	Type        string `gorm:"not null"` // 'due_reminder' | 'fine' | 'request_approved' | 'general'
-	IsRead      bool   `gorm:"column:is_read;default:false"`
+	UserID      int    `gorm:"not null" json:"user_id"`
+	Title       string `gorm:"not null" json:"title"`
+	Description string `gorm:"not null" json:"description"`
+	Type        string `gorm:"not null" json:"type"` // 'due_reminder' | 'fine' | 'request_approved' | 'general'
+	IsRead      bool   `gorm:"column:is_read;default:false" json:"is_read"`
+	IsActive    bool   `gorm:"column:is_active;default:false" json:"is_active"`
 }
 
 type NotificationRequest struct {
