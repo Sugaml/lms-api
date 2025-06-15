@@ -79,6 +79,7 @@ type UserResponse struct {
 	FullName  string    `json:"full_name"`
 	Program   string    `json:"program"`
 	StudentID string    `json:"student_id"`
+	IsActive  bool      `json:"is_active"`
 }
 
 func (u *UserRequest) Validate() error {

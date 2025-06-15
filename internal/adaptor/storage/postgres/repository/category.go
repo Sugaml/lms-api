@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/sugaml/lms-api/internal/core/domain"
-	"gorm.io/gorm"
 )
 
 // CreateCategory creates a new Category record in the database
@@ -35,9 +34,6 @@ func (r *Repository) Get(ctx context.Context, id string) (*domain.Category, erro
 		Model(&domain.Category{}).
 		Select("id, name, created_at, updated_at, weight, is_active").
 		Where("id = ? AND is_active = true", id).
-		Preload("SubCategory", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id,created_at,updated_at, name, is_active")
-		}).
 		Take(&data).Error
 	if err != nil {
 		return nil, err
@@ -51,7 +47,7 @@ func (r *Repository) List(ctx context.Context, req *domain.ListCategoryRequest) 
 	count := 0
 	f := r.db.Model(&domain.Category{})
 	f = f.Where("lower(name) LIKE lower(?)", "%"+req.Query+"%")
-	err := f.Preload("SubCategory").Order(req.SortColumn + " " + req.SortDirection).
+	err := f.Order(req.SortColumn + " " + req.SortDirection).
 		Limit(req.Size).
 		Offset(req.Size * (req.Page - 1)).
 		Find(&categories).Error

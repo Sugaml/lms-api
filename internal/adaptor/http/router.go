@@ -49,16 +49,20 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	// Set Middileware
 	router.Use(CORSMiddleware())
 
-	_ = router.Group("/").Use(authMiddleware(handler.tokenMaker))
-
 	user := v1.Group("/users")
 	{
 		user.POST("", handler.CreateUser)
 		user.POST("/login", handler.LoginUser)
-		user.GET("", handler.ListUser)
-		user.GET("/:id", handler.GetUser)
-		user.PUT("", handler.UpdateUser)
-		user.DELETE("/:id", handler.DeleteUser)
+	}
+
+	v1.Use(authMiddleware(handler.tokenMaker))
+
+	userAuth := v1.Group("/users")
+	{
+		userAuth.GET("", handler.ListUser)
+		userAuth.GET("/:id", handler.GetUser)
+		userAuth.PUT("", handler.UpdateUser)
+		userAuth.DELETE("/:id", handler.DeleteUser)
 	}
 
 	category := v1.Group("/categories")
@@ -68,6 +72,15 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		category.GET("/:id", handler.GetCategory)
 		category.PUT("/:id", handler.UpdateCategory)
 		category.DELETE("/:id", handler.DeleteCategory)
+	}
+
+	program := v1.Group("/programs")
+	{
+		program.POST("", handler.CreateProgram)
+		program.GET("", handler.ListProgram)
+		program.GET("/:id", handler.GetProgram)
+		program.PUT("/:id", handler.UpdateProgram)
+		program.DELETE("/:id", handler.DeleteProgram)
 	}
 
 	auditlog := v1.Group("/auditlog")

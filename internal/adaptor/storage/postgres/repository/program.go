@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/sugaml/lms-api/internal/core/domain"
-	"gorm.io/gorm"
 )
 
 // CreateProgram creates a new Program record in the database
@@ -35,9 +34,6 @@ func (r *Repository) GetProgram(ctx context.Context, id string) (*domain.Program
 		Model(&domain.Program{}).
 		Select("id, name, created_at, updated_at, weight, is_active").
 		Where("id = ? AND is_active = true", id).
-		Preload("SubProgram", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id,created_at,updated_at, name, is_active")
-		}).
 		Take(&data).Error
 	if err != nil {
 		return nil, err
@@ -51,7 +47,7 @@ func (r *Repository) ListProgram(ctx context.Context, req *domain.ListProgramReq
 	count := 0
 	f := r.db.Model(&domain.Program{})
 	f = f.Where("lower(name) LIKE lower(?)", "%"+req.Query+"%")
-	err := f.Preload("SubProgram").Order(req.SortColumn + " " + req.SortDirection).
+	err := f.Order(req.SortColumn + " " + req.SortDirection).
 		Limit(req.Size).
 		Offset(req.Size * (req.Page - 1)).
 		Find(&categories).Error
