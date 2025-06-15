@@ -72,7 +72,7 @@ func (r *Repository) GetBookBorrowByUserID(user_id string) ([]*domain.BorrowedBo
 func (r *Repository) IsBookBorrowByUserID(userID string, bookID string) bool {
 	var count int64
 	err := r.db.Model(&domain.BorrowedBook{}).
-		Where("user_id = ? AND book_id = ?", userID, bookID).
+		Where("user_id = ? AND book_id = ? AND returned_date IS NULL", userID, bookID).
 		Count(&count).Error
 
 	if err != nil {

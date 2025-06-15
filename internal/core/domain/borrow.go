@@ -14,7 +14,7 @@ type BorrowedBook struct {
 	DueDate      time.Time  `gorm:"not null" json:"due_date"`
 	ReturnedDate *time.Time `gorm:"column:returned_date" json:"returned_date"`
 	RenewalCount int        `gorm:"default:0" json:"renewal_count"`
-	Status       string     `gorm:"not null" json:"status"` // 'borrowed' | 'returned' | 'overdue'
+	Status       string     `gorm:"not null" json:"status"` // 'pending' | 'borrowed' | 'returned' | 'overdue'
 	Remarks      string     `json:"remarks"`
 	IsActive     bool       `gorm:"column:is_active;default:false" json:"is_active"`
 	Student      *User      `gorm:"foreignkey:ID;references:UserID" json:"student"`
@@ -23,8 +23,9 @@ type BorrowedBook struct {
 }
 
 type BorrowBookResponse struct {
-	Title  string `json:"title"`
-	Author string `json:"author"`
+	Title      string `json:"title"`
+	Author     string `json:"author"`
+	CoverImage string `json:"cover_image"`
 }
 
 type BorrowStudentResponse struct {
@@ -80,6 +81,7 @@ type BorrowedBookResponse struct {
 	Librarian    *UserResponse          `json:"librarian"`
 	Book         *BorrowBookResponse    `json:"book"`
 	Remarks      string                 `json:"remarks"`
+	IsActive     bool                   `json:"is_active"`
 }
 
 func (r BorrowedBookRequest) Validate() error {

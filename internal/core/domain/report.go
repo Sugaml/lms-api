@@ -10,3 +10,10 @@ type LibraryDashboard struct {
 	TotalFines      int `json:"totalFines"`
 	TotalStudents   int `json:"totalStudents"`
 }
+
+type BorrowedBookStats struct {
+	TotalBorrowedBooks int64 `json:"totalBorrowedBooks"`
+	TotalOverdueBooks  int64 `json:"totalOverdueBooks"`
+	PendingRequests    int64 `json:"pendingRequests"`
+	DueSoon            int64 `json:"dueSoon"`
+}

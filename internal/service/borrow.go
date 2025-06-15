@@ -27,6 +27,7 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	}
 	data := domain.Convert[domain.BorrowedBookRequest, domain.BorrowedBook](req)
 	data.Status = "pending"
+	data.IsActive = true
 	result, err := s.repo.CreateBorrow(data)
 	if err != nil {
 		return nil, err

@@ -8,6 +8,7 @@ type Repository interface {
 	BookRepository
 	FineRepository
 	BorrowRepository
+	ReportRepository
 	NotificationRepository
 }
 type Service interface {
@@ -18,5 +19,6 @@ type Service interface {
 	BookService
 	FineService
 	BorrowService
+	ReportService
 	NotificationService
 }
