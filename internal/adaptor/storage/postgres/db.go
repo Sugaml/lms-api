@@ -41,6 +41,9 @@ func NewDB(config config.Config) (*gorm.DB, error) {
 		err = db.AutoMigrate(
 			&domain.User{},
 			&domain.AuditLog{},
+			&domain.Book{},
+			&domain.Fine{},
+			&domain.BorrowedBook{},
 		)
 		if err != nil {
 			return nil, err

@@ -15,6 +15,15 @@ type Book struct {
 	CoverImage      string `gorm:"column:cover_image"`
 }
 
+type BookRequest struct {
+	UserID       int        `json:"user_id"`
+	BookID       int        `json:"book_id"`
+	Status       string     `json:"status"` // 'pending' | 'approved' | 'rejected'
+	RequestDate  time.Time  `json:"request_date"`
+	ApprovedDate *time.Time `json:"approved_date"`
+	ApprovedBy   *int       `json:"approved_by"`
+}
+
 type BookListRequest struct {
 	ListRequest
 	Title           string `json:"title"`

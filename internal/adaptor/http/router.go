@@ -73,6 +73,33 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		book.DELETE("/:id", handler.DeleteBook)
 	}
 
+	borrow := v1.Group("/borrows")
+	{
+		borrow.POST("", handler.CreateBorrow)
+		borrow.GET("", handler.ListBorrow)
+		borrow.GET("/:id", handler.GetBorrow)
+		borrow.PUT("", handler.UpdateBorrow)
+		borrow.DELETE("/:id", handler.DeleteBorrow)
+	}
+
+	fine := v1.Group("/fines")
+	{
+		fine.POST("", handler.CreateFine)
+		fine.GET("", handler.ListFine)
+		fine.GET("/:id", handler.GetFine)
+		fine.PUT("", handler.UpdateFine)
+		fine.DELETE("/:id", handler.DeleteFine)
+	}
+
+	notification := v1.Group("/notifications")
+	{
+		notification.POST("", handler.CreateNotification)
+		notification.GET("", handler.ListNotification)
+		notification.GET("/:id", handler.GetNotification)
+		notification.PUT("", handler.UpdateNotification)
+		notification.DELETE("/:id", handler.DeleteNotification)
+	}
+
 	return &Router{
 		router,
 	}, nil
