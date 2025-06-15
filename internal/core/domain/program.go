@@ -1,11 +1,10 @@
 package domain
 
 import (
-	"encoding/json"
 	"time"
 )
 
-type Category struct {
+type Program struct {
 	BaseModel
 	Name     string `gorm:"name"`
 	Slug     string `gorm:"slug"`
@@ -16,24 +15,23 @@ type Category struct {
 	IsActive bool   `gorm:"is_active"`
 }
 
-type CategoryRequest struct {
+type ProgramRequest struct {
 	Name     string `json:"name"`
 	Slug     string `json:"slug"`
 	Type     string `json:"type"`
-	UserID   string `json:"user_id"`
 	Weight   int    `json:"weight"`
 	Tags     string `json:"tags"`
 	Labels   string `json:"labels"`
 	IsActive bool   `json:"is_active"`
 }
 
-type ListCategoryRequest struct {
+type ListProgramRequest struct {
 	ListRequest
 	Weight   int  `form:"weight"`
 	IsActive bool `form:"is_active"`
 }
 
-type CategoryUpdateRequest struct {
+type ProgramUpdateRequest struct {
 	Name     string `json:"name"`
 	Tags     string `json:"tags"`
 	Labels   string `json:"labels"`
@@ -41,7 +39,7 @@ type CategoryUpdateRequest struct {
 	IsActive *bool  `json:"is_active"`
 }
 
-type CategoryResponse struct {
+type ProgramResponse struct {
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -51,21 +49,21 @@ type CategoryResponse struct {
 	IsActive  bool      `json:"is_active"`
 }
 
-func (r *CategoryRequest) Validate() error {
+func (r *ProgramRequest) Validate() error {
 	if err := IsValidName(r.Name); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *Category) NewCategory(req *CategoryRequest) {
+func (c *Program) NewProgram(req *ProgramRequest) {
 	c.Name = req.Name
 	c.Labels = req.Labels
 	c.Tags = req.Tags
 	c.IsActive = true
 }
 
-func (r *CategoryUpdateRequest) NewUpdateRequest() Map {
+func (r *ProgramUpdateRequest) NewUpdateRequest() Map {
 	mp := map[string]interface{}{}
 	if r.Name != "" {
 		mp["name"] = r.Name
@@ -82,16 +80,8 @@ func (r *CategoryUpdateRequest) NewUpdateRequest() Map {
 	return mp
 }
 
-func (c *Category) CategoryResponse() *CategoryResponse {
-	data := &CategoryResponse{}
+func (c *Program) ProgramResponse() *ProgramResponse {
+	data := &ProgramResponse{}
 	_ = ConvertType(c, data)
 	return data
-}
-
-func ConvertType(source any, target any) error {
-	sbytes, err := json.Marshal(source)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(sbytes, &target)
 }

@@ -4,6 +4,7 @@ type Repository interface {
 	AuditLogRepository
 	UserRepository
 	CategoryRepository
+	ProgramRepository
 	BookRepository
 	FineRepository
 	BorrowRepository
@@ -13,6 +14,7 @@ type Service interface {
 	AuditLogService
 	UserService
 	CategoryService
+	ProgramService
 	BookService
 	FineService
 	BorrowService

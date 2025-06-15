@@ -11,6 +11,7 @@ type Book struct {
 	Author          string `gorm:"not null" json:"author"`
 	ISBN            string `gorm:"unique;not null" json:"isbn"`
 	Category        string `gorm:"not null" json:"category"`
+	CategoryID      string `gorm:"not null" json:"category_id"`
 	Program         string `gorm:"not null" json:"program"`
 	TotalCopies     int    `gorm:"not null" json:"total_copies"`
 	AvailableCopies int    `gorm:"not null" json:"available_copies"`
@@ -22,6 +23,7 @@ type Book struct {
 type BookRequest struct {
 	UserID       int        `json:"user_id"`
 	BookID       int        `json:"book_id"`
+	CategoryID   string     `json:"category_id"`
 	Status       string     `json:"status"` // 'pending' | 'approved' | 'rejected'
 	RequestDate  time.Time  `json:"request_date"`
 	ApprovedDate *time.Time `json:"approved_date"`
@@ -30,15 +32,15 @@ type BookRequest struct {
 
 type BookListRequest struct {
 	ListRequest
-	Title           string `json:"title"`
-	Author          string `json:"author"`
-	ISBN            string `json:"isbn"`
-	Category        string `json:"category"`
-	Program         string `json:"program"`
-	TotalCopies     int    `json:"total_copies"`
-	AvailableCopies int    `json:"available_copies"`
-	Description     string `json:"description"`
-	CoverImage      string `json:"cover_image"`
+	Title           string `form:"title"`
+	Author          string `form:"author"`
+	ISBN            string `form:"isbn"`
+	Category        string `form:"category"`
+	Program         string `form:"program"`
+	TotalCopies     int    `form:"total_copies"`
+	AvailableCopies int    `form:"available_copies"`
+	Description     string `form:"description"`
+	CoverImage      string `form:"cover_image"`
 }
 
 type BookUpdateRequest struct {
