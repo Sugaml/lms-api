@@ -81,6 +81,31 @@ func (h *Handler) ListUser(ctx *gin.Context) {
 	SuccessResponse(ctx, result, WithPagination(count, req.Page, req.Size))
 }
 
+// ListUser 		godoc
+// @Summary 		List User
+// @Description 	List User
+// @Tags 			User
+// @Accept  		json
+// @Produce  		json
+// @Security 		ApiKeyAuth
+// @Param 			query 						query 		string 		false 	"query"
+// @Success 		200 		{array} 		domain.StudentResponse
+// @Router 			/users	 	[get]
+func (h *Handler) ListStudent(ctx *gin.Context) {
+	var req domain.UserListRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	req.Prepare()
+	result, count, err := h.svc.ListStudent(&req)
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	SuccessResponse(ctx, result, WithPagination(count, req.Page, req.Size))
+}
+
 // GetUser 			godoc
 // @Summary 		Get User
 // @Description 	Get User from Id

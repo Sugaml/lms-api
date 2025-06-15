@@ -82,6 +82,19 @@ type UserResponse struct {
 	IsActive  bool      `json:"is_active"`
 }
 
+type StudentResponse struct {
+	ID            string `json:"id"`
+	FullName      string `json:"full_name"`
+	Email         string `json:"email"`
+	StudentID     string `json:"student_id"`
+	Program       string `json:"program"`
+	BorrowedCount int    `json:"borrowed_count" default:"10"`
+	OverdueCount  int    `json:"overdue_count"  default:"10"`
+	Fines         int    `json:"fines"  default:"10"`
+	Status        string `json:"status"  default:"clearance"`
+	ProfileImage  string `json:"profile_image"`
+}
+
 func (u *UserRequest) Validate() error {
 	if u.Username == "" {
 		return errors.New("username is required")

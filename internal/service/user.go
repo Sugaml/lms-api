@@ -68,6 +68,20 @@ func (s *Service) ListUser(req *domain.UserListRequest) ([]*domain.UserResponse,
 	return datas, count, nil
 }
 
+// ListUsers retrieves a list of Users
+func (s *Service) ListStudent(req *domain.UserListRequest) ([]*domain.StudentResponse, int64, error) {
+	var datas = []*domain.StudentResponse{}
+	results, count, err := s.repo.ListStudent(req)
+	if err != nil {
+		return nil, count, err
+	}
+	for _, result := range results {
+		data := domain.Convert[domain.User, domain.StudentResponse](result)
+		datas = append(datas, data)
+	}
+	return datas, count, nil
+}
+
 func (s *Service) GetUser(id string) (*domain.UserResponse, error) {
 	result, err := s.repo.GetUser(id)
 	if err != nil {

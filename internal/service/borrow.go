@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 
+	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
@@ -12,7 +13,20 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	if err != nil {
 		return nil, err
 	}
+	isBookBorrowd := s.repo.IsBookBorrowByUserID(req.UserID, req.BookID)
+	if isBookBorrowd {
+		return nil, errors.New("book already borrowed")
+	}
+	_, err = s.repo.GetBook(req.BookID)
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.repo.GetUser(req.UserID)
+	if err != nil {
+		return nil, err
+	}
 	data := domain.Convert[domain.BorrowedBookRequest, domain.BorrowedBook](req)
+	data.Status = "pending"
 	result, err := s.repo.CreateBorrow(data)
 	if err != nil {
 		return nil, err
@@ -45,7 +59,7 @@ func (s *Service) GetBorrow(id string) (*domain.BorrowedBookResponse, error) {
 
 func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest) (*domain.BorrowedBookResponse, error) {
 	if id == "" {
-		return nil, errors.New("required BorrowedBook id")
+		return nil, errors.New("required borrow id")
 	}
 	_, err := s.repo.GetBorrow(id)
 	if err != nil {
@@ -53,6 +67,7 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 	}
 	// update
 	mp := req.NewUpdate()
+	logrus.Info(mp)
 	result, err := s.repo.UpdateBorrow(id, mp)
 	if err != nil {
 		return nil, err

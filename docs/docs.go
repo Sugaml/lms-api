@@ -1430,6 +1430,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/students": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add a new Student",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Student"
+                ],
+                "summary": "Add a new Student",
+                "parameters": [
+                    {
+                        "description": "Add Student Request",
+                        "name": "StudentRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student created",
+                        "schema": {
+                            "$ref": "#/definitions/domain.StudentResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -1462,7 +1501,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/domain.UserResponse"
+                                "$ref": "#/definitions/domain.StudentResponse"
                             }
                         }
                     }
@@ -1750,26 +1789,28 @@ const docTemplate = `{
         "domain.BookRequest": {
             "type": "object",
             "properties": {
-                "approved_by": {
-                    "type": "integer"
-                },
-                "approved_date": {
+                "author": {
                     "type": "string"
                 },
-                "book_id": {
-                    "type": "integer"
-                },
-                "category_id": {
+                "category": {
                     "type": "string"
                 },
-                "request_date": {
+                "cover_image": {
                     "type": "string"
                 },
-                "status": {
-                    "description": "'pending' | 'approved' | 'rejected'",
+                "description": {
                     "type": "string"
                 },
-                "user_id": {
+                "isbn": {
+                    "type": "string"
+                },
+                "program": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "total_copies": {
                     "type": "integer"
                 }
             }
@@ -1796,7 +1837,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "isbn": {
                     "type": "string"
@@ -1817,9 +1858,6 @@ const docTemplate = `{
             "properties": {
                 "author": {
                     "type": "string"
-                },
-                "available_copies": {
-                    "type": "integer"
                 },
                 "category": {
                     "type": "string"
@@ -1850,9 +1888,6 @@ const docTemplate = `{
                 "book_id": {
                     "type": "string"
                 },
-                "borrowed_date": {
-                    "type": "string"
-                },
                 "due_date": {
                     "type": "string"
                 },
@@ -1860,10 +1895,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "returned_date": {
-                    "type": "string"
-                },
-                "status": {
-                    "description": "'borrowed' | 'returned' | 'overdue'",
                     "type": "string"
                 },
                 "user_id": {
@@ -1874,6 +1905,9 @@ const docTemplate = `{
         "domain.BorrowedBookResponse": {
             "type": "object",
             "properties": {
+                "book": {
+                    "$ref": "#/definitions/domain.BookResponse"
+                },
                 "book_id": {
                     "type": "string"
                 },
@@ -1889,6 +1923,15 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "librarian": {
+                    "$ref": "#/definitions/domain.UserResponse"
+                },
+                "librarian_id": {
+                    "type": "string"
+                },
+                "remarks": {
+                    "type": "string"
+                },
                 "renewal_count": {
                     "type": "integer"
                 },
@@ -1898,6 +1941,9 @@ const docTemplate = `{
                 "status": {
                     "description": "'borrowed' | 'returned' | 'overdue'",
                     "type": "string"
+                },
+                "student": {
+                    "$ref": "#/definitions/domain.UserResponse"
                 },
                 "user_id": {
                     "type": "string"
@@ -2210,6 +2256,45 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.StudentResponse": {
+            "type": "object",
+            "properties": {
+                "borrowed_count": {
+                    "type": "integer",
+                    "default": 10
+                },
+                "email": {
+                    "type": "string"
+                },
+                "fines": {
+                    "type": "integer",
+                    "default": 10
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "overdue_count": {
+                    "type": "integer",
+                    "default": 10
+                },
+                "profile_image": {
+                    "type": "string"
+                },
+                "program": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "default": "clearance"
+                },
+                "student_id": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.UpdateBorrowedBookRequest": {
             "type": "object",
             "properties": {
@@ -2220,6 +2305,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "due_date": {
+                    "type": "string"
+                },
+                "librarian_id": {
+                    "type": "string"
+                },
+                "remarks": {
                     "type": "string"
                 },
                 "renewal_count": {

@@ -40,14 +40,11 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 
 	router := gin.Default()
 
+	router.Use(CORSMiddleware())
 	v1 := router.Group("/api/v1/lms")
-
 	// setup Swagger
 	docs.SwaggerInfo.Host = config.HOST_PATH
 	v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.DefaultModelsExpandDepth(-1)))
-
-	// Set Middileware
-	router.Use(CORSMiddleware())
 
 	user := v1.Group("/users")
 	{
@@ -101,12 +98,18 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		book.DELETE("/:id", handler.DeleteBook)
 	}
 
+	student := v1.Group("/students")
+	{
+		student.POST("", handler.CreateStudent)
+		student.GET("", handler.ListStudent)
+	}
+
 	borrow := v1.Group("/borrows")
 	{
 		borrow.POST("", handler.CreateBorrow)
 		borrow.GET("", handler.ListBorrow)
 		borrow.GET("/:id", handler.GetBorrow)
-		borrow.PUT("", handler.UpdateBorrow)
+		borrow.PUT("/:id", handler.UpdateBorrow)
 		borrow.DELETE("/:id", handler.DeleteBorrow)
 	}
 
