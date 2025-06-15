@@ -6,6 +6,54 @@ import (
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
+func (r *Repository) GetLibraryDashboardStats() (*domain.LibraryDashboardStats, error) {
+	var stats domain.LibraryDashboardStats
+	now := time.Now()
+
+	//Count total students
+	if err := r.db.Model(&domain.User{}).
+		Where("role = ?", "student").
+		Count(&stats.TotalStudents).Error; err != nil {
+		return nil, err
+	}
+
+	//Count active students
+	if err := r.db.Model(&domain.User{}).
+		Where("role = ? AND is_active = ?", "student", true).
+		Count(&stats.ActiveStudents).Error; err != nil {
+		return nil, err
+	}
+
+	//Count total active books
+	if err := r.db.Model(&domain.Book{}).
+		Count(&stats.TotalBooks).Error; err != nil {
+		return nil, err
+	}
+
+	// Count total pending books
+	if err := r.db.Model(&domain.BorrowedBook{}).
+		Where("status = ? AND returned_date IS NULL AND is_active = ?", "borrowed", true).
+		Count(&stats.PendingRequests).Error; err != nil {
+		return nil, err
+	}
+
+	// Count total borrowed books
+	if err := r.db.Model(&domain.BorrowedBook{}).
+		Where("status = ? AND due_date < ? AND returned_date IS NULL AND is_active = ?", "borrowed", now, true).
+		Count(&stats.BorrowedBooks).Error; err != nil {
+		return nil, err
+	}
+
+	// Count overdue books
+	if err := r.db.Model(&domain.BorrowedBook{}).
+		Where("status = ? AND due_date < ? AND returned_date IS NULL AND is_active = ?", "borrowed", now, true).
+		Count(&stats.OverdueBooks).Error; err != nil {
+		return nil, err
+	}
+
+	return &stats, nil
+}
+
 func (r *Repository) GetBorrowedBookStats() (*domain.BorrowedBookStats, error) {
 	var stats domain.BorrowedBookStats
 	now := time.Now()
