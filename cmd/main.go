@@ -20,6 +20,7 @@ import (
 	"github.com/sugaml/lms-api/internal/adaptor/http"
 	"github.com/sugaml/lms-api/internal/adaptor/storage/postgres"
 	"github.com/sugaml/lms-api/internal/adaptor/storage/postgres/repository"
+	"github.com/sugaml/lms-api/internal/core/auth"
 	"github.com/sugaml/lms-api/internal/service"
 )
 
@@ -46,7 +47,11 @@ func main() {
 
 	repo := repository.NewRepository(db)
 	svc := service.NewService(repo)
-	handler := http.NewHandler(svc, config)
+	tokenMaker, err := auth.NewJWTMaker(config.JWT_SECRET)
+	if err != nil {
+		logrus.WithError(err).Fatal("Error initializing token maker")
+	}
+	handler := http.NewHandler(svc, config, tokenMaker)
 
 	// Init router
 	router, err := http.NewRouter(

@@ -6,6 +6,8 @@ type Config struct {
 	APP_DEBUG string `json:"APP_DEBUG" default:"true"`
 	APP_PORT  string `json:"APP_PORT" default:"8080"`
 
+	JWT_SECRET string `json:"JWT_SECRET" default:"postgres"`
+
 	DB_DRIVER       string `json:"DB_DRIVER" default:"postgres"`
 	DB_SOURCE       string `json:"DB_SOURCE" default:"postgresql://postgres:postgres@localhost:5432/parking?sslmode=disable"`
 	DB_DEBUG        string `json:"DB_DEBUG" default:"false"`

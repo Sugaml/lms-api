@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sugaml/lms-api/internal/adaptor/config"
+	"github.com/sugaml/lms-api/internal/core/auth"
 	"github.com/sugaml/lms-api/internal/core/port"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -11,15 +12,17 @@ import (
 )
 
 type Handler struct {
-	svc    port.Service
-	config config.Config
+	svc        port.Service
+	config     config.Config
+	tokenMaker auth.Maker
 }
 
 // NewHandler creates a new Handler instance
-func NewHandler(svc port.Service, config config.Config) *Handler {
+func NewHandler(svc port.Service, config config.Config, tokenMaker auth.Maker) *Handler {
 	return &Handler{
 		svc,
 		config,
+		tokenMaker,
 	}
 }
 
@@ -44,7 +47,9 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.DefaultModelsExpandDepth(-1)))
 
 	// Set Middileware
-	v1.Use(extractUserInfo())
+	router.Use(CORSMiddleware())
+
+	_ = router.Group("/").Use(authMiddleware(handler.tokenMaker))
 
 	user := v1.Group("/users")
 	{

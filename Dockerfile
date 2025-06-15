@@ -1,6 +1,6 @@
 # Stage 1: Build the Go binary with CGO enabled
 FROM golangci/golangci-lint:v1.63 AS base
-LABEL maintainer="hem.shrestha@ankaek.com"
+LABEL maintainer="tamangsugam09@gmail.com"
 LABEL last_modified="2024-09-01"
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -27,6 +27,4 @@ WORKDIR /app
 RUN touch .env
 COPY --from=builder /app/main .
 COPY --from=builder /app/docs/* ./docs/
-COPY --from=builder /app/templates/* ./templates/
-COPY --from=builder /app/static/* ./static/
 CMD ["/app/main"]

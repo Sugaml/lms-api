@@ -16,7 +16,7 @@ import (
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Security 		UserAuth
-// @Param			AuditLogRequest			body		domain.AuditLogRequest		true		"Add Parking AuditLog Request"
+// @Param			AuditLogRequest			body			domain.AuditLogRequest		true		"Add Parking AuditLog Request"
 // @Success			200						{object}		domain.AuditLogResponse					"Parking AuditLog created"
 // @Router			/auditlog 		[post]
 func (h *Handler) CreateAuditLog(ctx *gin.Context) {
