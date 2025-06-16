@@ -102,12 +102,15 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	{
 		student.POST("", handler.CreateStudent)
 		student.GET("", handler.ListStudent)
+		student.GET("/:id", handler.GetUser)
+		student.GET("/:id/borrows", handler.GetStudntBorrow)
 	}
 
 	report := v1.Group("/reports")
 	{
 		report.GET("dashboard-stats", handler.GetLibraryDashboardStats)
 		report.GET("borrowedbookstats", handler.GetBorrowedBookStats)
+		report.GET("program-stats", handler.GetBookProgramstats)
 	}
 	borrow := v1.Group("/borrows")
 	{

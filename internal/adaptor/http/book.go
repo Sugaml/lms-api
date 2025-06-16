@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
@@ -19,6 +20,12 @@ import (
 // @Success			200					{object}	domain.BookResponse					"Book created"
 // @Router			/books 				[post]
 func (h *Handler) CreateBook(ctx *gin.Context) {
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
 	var req *domain.BookRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
@@ -49,6 +56,12 @@ func (h *Handler) ListBook(ctx *gin.Context) {
 		return
 	}
 	req.Prepare()
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
 	result, count, err := h.svc.ListBook(&req)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)

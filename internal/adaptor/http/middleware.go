@@ -14,6 +14,7 @@ const (
 	authorizationHeaderKey  = "authorization"
 	authorizationTypeBearer = "bearer"
 	authorizationPayloadKey = "authorization_payload"
+	authorizationUserrIDKey = "authorization_user_id"
 )
 
 func errorResponse(err error) gin.H {
@@ -46,7 +47,9 @@ func authMiddleware(tokenMaker auth.Maker) gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse(err))
 			return
 		}
+		ctx.Set(authorizationHeaderKey, authorizationHeader)
 		ctx.Set(authorizationPayloadKey, payload)
+		ctx.Set(authorizationUserrIDKey, payload.UserID)
 		ctx.Next()
 	}
 }

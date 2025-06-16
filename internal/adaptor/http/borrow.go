@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
@@ -19,6 +20,12 @@ import (
 // @Success			200					{object}	domain.BorrowedBookResponse					"Borrow created"
 // @Router			/borrows 				[post]
 func (h *Handler) CreateBorrow(ctx *gin.Context) {
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
 	var req *domain.BorrowedBookRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
@@ -43,6 +50,12 @@ func (h *Handler) CreateBorrow(ctx *gin.Context) {
 // @Success 		200 		{array} 		domain.BorrowedBookResponse
 // @Router 			/borrows	 	[get]
 func (h *Handler) ListBorrow(ctx *gin.Context) {
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
 	var req domain.ListBorrowedBookRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
@@ -68,8 +81,40 @@ func (h *Handler) ListBorrow(ctx *gin.Context) {
 // @Success 		200 {object} domain.BorrowedBookResponse
 // @Router 			/borrows/{id} [get]
 func (h *Handler) GetBorrow(ctx *gin.Context) {
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
 	id := ctx.Param("id")
 	result, err := h.svc.GetBorrow(id)
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	SuccessResponse(ctx, result)
+}
+
+// GetBorrow 		godoc
+// @Summary 		Get Borrow
+// @Description 	Get Borrow from Student Id
+// @Tags 			Borrow
+// @Accept  		json
+// @Produce  		json
+// @Security 		ApiKeyAuth
+// @Param 			id path string true "Borrow id"
+// @Success 		200 {object} domain.BorrowedBookResponse
+// @Router 			/stdents/{id}/borrows [get]
+func (h *Handler) GetStudntBorrow(ctx *gin.Context) {
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
+	id := ctx.Param("id")
+	result, err := h.svc.GetStudentsBorrowBook(id)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -89,6 +134,12 @@ func (h *Handler) GetBorrow(ctx *gin.Context) {
 // @Success 			200 						{object} 	domain.BorrowedBookResponse
 // @Router 				/borrows/{id} 				[put]
 func (h *Handler) UpdateBorrow(ctx *gin.Context) {
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
 	id := ctx.Param("id")
 	var req *domain.UpdateBorrowedBookRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

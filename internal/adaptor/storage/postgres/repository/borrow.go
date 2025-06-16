@@ -63,7 +63,8 @@ func (r *Repository) GetBookBorrowByUserID(user_id string) ([]*domain.BorrowedBo
 	var data []*domain.BorrowedBook
 	if err := r.db.Model(&domain.BorrowedBook{}).
 		Preload("Book").
-		Where("user_id = ? = ?", user_id).Find(&data).Error; err != nil {
+		Preload("Student").
+		Where("user_id = ?", user_id).Find(&data).Error; err != nil {
 		return nil, err
 	}
 	return data, nil

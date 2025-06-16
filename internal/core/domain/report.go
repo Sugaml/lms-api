@@ -17,3 +17,8 @@ type BorrowedBookStats struct {
 	PendingRequests    int64 `json:"pendingRequests"`
 	DueSoon            int64 `json:"dueSoon"`
 }
+
+type BookProgramstats struct {
+	Program string `json:"program"`
+	Count   int64  `json:"count"`
+}

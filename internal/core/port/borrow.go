@@ -19,6 +19,7 @@ type BorrowRepository interface {
 type BorrowService interface {
 	CreateBorrow(data *domain.BorrowedBookRequest) (*domain.BorrowedBookResponse, error)
 	ListBorrow(req *domain.ListBorrowedBookRequest) ([]*domain.BorrowedBookResponse, int64, error)
+	GetStudentsBorrowBook(id string) ([]*domain.BorrowedBookResponse, error)
 	GetBorrow(id string) (*domain.BorrowedBookResponse, error)
 	UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest) (*domain.BorrowedBookResponse, error)
 	DeleteBorrow(id string) (*domain.BorrowedBookResponse, error)

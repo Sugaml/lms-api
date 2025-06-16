@@ -88,3 +88,14 @@ func (r *Repository) GetBorrowedBookStats() (*domain.BorrowedBookStats, error) {
 
 	return &stats, nil
 }
+
+func (r *Repository) GetBookProgramstats() (*[]domain.BookProgramstats, error) {
+	var stats []domain.BookProgramstats
+	if err := r.db.Model(&domain.Book{}).
+		Select("program, count(*) as count").
+		Group("program").
+		Find(&stats).Error; err != nil {
+		return nil, err
+	}
+	return &stats, nil
+}

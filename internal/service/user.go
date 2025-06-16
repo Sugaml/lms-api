@@ -44,6 +44,7 @@ func (s *Service) LoginUser(req *domain.LoginRequest) (*domain.LoginUserResponse
 	}
 	accessToken, err := s.tokenMaker.CreateToken(
 		user.Username,
+		user.ID,
 	)
 	if err != nil {
 		return nil, err

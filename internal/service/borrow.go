@@ -58,6 +58,19 @@ func (s *Service) GetBorrow(id string) (*domain.BorrowedBookResponse, error) {
 	return data, nil
 }
 
+func (s *Service) GetStudentsBorrowBook(id string) ([]*domain.BorrowedBookResponse, error) {
+	var datas = []*domain.BorrowedBookResponse{}
+	results, err := s.repo.GetBookBorrowByUserID(id)
+	if err != nil {
+		return nil, err
+	}
+	for _, result := range results {
+		data := domain.Convert[domain.BorrowedBook, domain.BorrowedBookResponse](result)
+		datas = append(datas, data)
+	}
+	return datas, nil
+}
+
 func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest) (*domain.BorrowedBookResponse, error) {
 	if id == "" {
 		return nil, errors.New("required borrow id")

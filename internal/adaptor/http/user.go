@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
@@ -92,6 +93,12 @@ func (h *Handler) ListUser(ctx *gin.Context) {
 // @Success 		200 		{array} 		domain.StudentResponse
 // @Router 			/users	 	[get]
 func (h *Handler) ListStudent(ctx *gin.Context) {
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
 	var req domain.UserListRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)

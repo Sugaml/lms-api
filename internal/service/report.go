@@ -17,3 +17,11 @@ func (s *Service) GetBorrowedBookStats() (*domain.BorrowedBookStats, error) {
 	}
 	return result, nil
 }
+
+func (s *Service) GetBookProgramstats() (*[]domain.BookProgramstats, error) {
+	result, err := s.repo.GetBookProgramstats()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
