@@ -36,6 +36,7 @@ func (s *Service) ListBook(req *domain.BookListRequest) ([]*domain.BookResponse,
 	}
 	for _, result := range results {
 		data := domain.Convert[domain.Book, domain.BookResponse](result)
+		data.AvailableCopies, _ = s.repo.GetAvailableCopies(data.ID)
 		datas = append(datas, data)
 	}
 	return datas, count, nil

@@ -38,6 +38,7 @@ type BorrowedBookRequest struct {
 	UserID       string     `json:"user_id"`
 	BookID       string     `json:"book_id"`
 	DueDate      time.Time  `json:"due_date"`
+	Status       string     `json:"status"`
 	ReturnedDate *time.Time `json:"returned_date"`
 	RenewalCount int        `json:"renewal_count"`
 }

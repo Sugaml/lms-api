@@ -3,6 +3,7 @@ package repository
 import (
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
@@ -68,6 +69,30 @@ func (r *Repository) GetBookBorrowByUserID(user_id string) ([]*domain.BorrowedBo
 		return nil, err
 	}
 	return data, nil
+}
+
+func (r *Repository) GetAvailableCopies(bookID string) (int, error) {
+	// First, load the book
+	var book domain.Book
+	if err := r.db.First(&book, "id = ?", bookID).Error; err != nil {
+		return 0, err
+	}
+
+	// Count currently borrowed copies
+	var borrowedCount int64
+	if err := r.db.Model(&domain.BorrowedBook{}).
+		Where("book_id = ? AND status = ?", bookID, "borrowed").
+		Count(&borrowedCount).Error; err != nil {
+		return 0, err
+	}
+
+	availableCopies := book.TotalCopies - int(borrowedCount)
+	logrus.Infof("total copies:%d  and abvailable copies: %d", book.TotalCopies, availableCopies)
+	if availableCopies < 0 {
+		availableCopies = 0 // Just in case
+	}
+
+	return availableCopies, nil
 }
 
 func (r *Repository) IsBookBorrowByUserID(userID string, bookID string) bool {
