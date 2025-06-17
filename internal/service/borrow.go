@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
@@ -17,11 +18,11 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	if isBookBorrowd {
 		return nil, errors.New("book already borrowed")
 	}
-	_, err = s.repo.GetBook(req.BookID)
+	book, err := s.repo.GetBook(req.BookID)
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.repo.GetUser(req.UserID)
+	user, err := s.repo.GetUser(req.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -33,6 +34,26 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	result, err := s.repo.CreateBorrow(data)
 	if err != nil {
 		return nil, err
+	}
+	if data.Status == "borrowed" {
+		data.Status = "issued"
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("%s book has %s to %s", book.Title, result.Status, user.FullName),
+			UserID:   &result.ID,
+			Action:   "issue",
+			Data:     fmt.Sprint(req),
+			IsActive: true,
+		})
+	}
+	if data.Status == "pending" {
+		data.Status = "requested"
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("%s book has %s by %s", book.Title, result.Status, user.FullName),
+			UserID:   &result.ID,
+			Action:   "create",
+			Data:     fmt.Sprint(req),
+			IsActive: true,
+		})
 	}
 	return domain.Convert[domain.BorrowedBook, domain.BorrowedBookResponse](result), nil
 }
@@ -77,7 +98,16 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 	if id == "" {
 		return nil, errors.New("required borrow id")
 	}
-	_, err := s.repo.GetBorrow(id)
+	borrow, err := s.repo.GetBorrow(id)
+	if err != nil {
+		return nil, err
+	}
+
+	book, err := s.repo.GetBook(borrow.BookID)
+	if err != nil {
+		return nil, err
+	}
+	user, err := s.repo.GetUser(borrow.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +117,26 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 	result, err := s.repo.UpdateBorrow(id, mp)
 	if err != nil {
 		return nil, err
+	}
+	if result.Status == "borrowed" {
+		result.Status = "issued"
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("%s book has %s to %s", book.Title, result.Status, user.FullName),
+			UserID:   &result.ID,
+			Action:   "issue",
+			Data:     fmt.Sprint(req),
+			IsActive: true,
+		})
+	}
+	if result.Status == "returned" {
+		result.Status = "returned"
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("%s book has %s by %s", book.Title, result.Status, user.FullName),
+			UserID:   &result.ID,
+			Action:   "update",
+			Data:     fmt.Sprint(req),
+			IsActive: true,
+		})
 	}
 	data := domain.Convert[domain.BorrowedBook, domain.BorrowedBookResponse](result)
 	return data, nil

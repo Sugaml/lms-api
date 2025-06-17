@@ -20,6 +20,9 @@ func (r *Repository) ListBook(req *domain.BookListRequest) ([]*domain.Book, int6
 	if req.Query != "" {
 		req.SortColumn = "score desc, " + req.SortColumn
 	}
+	if req.Title != "" {
+		f = f.Where("title ILIKE ?", "%"+req.Title+"%") // Use ILIKE for case-insensitive search (PostgreSQL)
+	}
 	err := f.Count(&count).
 		Order(req.SortColumn + " " + req.SortDirection).
 		Limit(req.Size).
