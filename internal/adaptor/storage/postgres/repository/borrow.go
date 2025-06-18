@@ -71,7 +71,7 @@ func (r *Repository) GetBookBorrowByUserID(user_id string) ([]*domain.BorrowedBo
 	return data, nil
 }
 
-func (r *Repository) GetAvailableCopies(bookID string) (int, error) {
+func (r *Repository) GetAvailableCopies(bookID string) (uint, error) {
 	// First, load the book
 	var book domain.Book
 	if err := r.db.First(&book, "id = ?", bookID).Error; err != nil {
@@ -85,13 +85,8 @@ func (r *Repository) GetAvailableCopies(bookID string) (int, error) {
 		Count(&borrowedCount).Error; err != nil {
 		return 0, err
 	}
-
-	availableCopies := book.TotalCopies - int(borrowedCount)
+	availableCopies := book.TotalCopies - uint(borrowedCount)
 	logrus.Infof("total copies:%d  and abvailable copies: %d", book.TotalCopies, availableCopies)
-	if availableCopies < 0 {
-		availableCopies = 0 // Just in case
-	}
-
 	return availableCopies, nil
 }
 

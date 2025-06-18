@@ -13,9 +13,10 @@ type Book struct {
 	Category    string `gorm:"not null" json:"category"`
 	CategoryID  string `gorm:"not null" json:"category_id"`
 	Program     string `gorm:"not null" json:"program"`
-	TotalCopies int    `gorm:"not null" json:"total_copies"`
+	TotalCopies uint   `gorm:"not null" json:"total_copies"`
 	Description string `gorm:"not null" json:"description"`
 	CoverImage  string `gorm:"column:cover_image" json:"cover_image"`
+	TotalPages  uint   `gorm:"column:total_pages" json:"total_pages"`
 	IsActive    bool   `gorm:"column:is_active;default:false" json:"is_active"`
 }
 
@@ -25,7 +26,8 @@ type BookRequest struct {
 	ISBN        string `json:"isbn"`
 	Category    string `json:"category"`
 	Program     string `json:"program"`
-	TotalCopies int    `json:"total_copies"`
+	TotalCopies uint   `json:"total_copies"`
+	TotalPages  uint   `json:"total_pages"`
 	Description string `json:"description"`
 	CoverImage  string `json:"cover_image"`
 }
@@ -37,7 +39,7 @@ type BookListRequest struct {
 	ISBN        string `form:"isbn"`
 	Category    string `form:"category"`
 	Program     string `form:"program"`
-	TotalCopies int    `form:"total_copies"`
+	TotalCopies uint   `form:"total_copies"`
 	Description string `form:"description"`
 	CoverImage  string `form:"cover_image"`
 }
@@ -48,7 +50,8 @@ type BookUpdateRequest struct {
 	ISBN        string `json:"isbn"`
 	Category    string `json:"category"`
 	Program     string `json:"program"`
-	TotalCopies int    `json:"total_copies"`
+	TotalCopies uint   `json:"total_copies"`
+	TotalPages  uint   `json:"total_pages"`
 	Description string `json:"description"`
 	CoverImage  string `json:"cover_image"`
 }
@@ -73,8 +76,8 @@ type BookResponse struct {
 	ISBN            string    `json:"isbn"`
 	Category        string    `json:"category"`
 	Program         string    `json:"program"`
-	TotalCopies     int       `json:"total_copies"`
-	AvailableCopies int       `json:"available_copies"`
+	TotalCopies     uint      `json:"total_copies"`
+	AvailableCopies uint      `json:"available_copies"`
 	Description     string    `json:"description"`
 	CoverImage      string    `json:"cover_image"`
 }

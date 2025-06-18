@@ -9,7 +9,7 @@ type BorrowRepository interface {
 	CreateBorrow(data *domain.BorrowedBook) (*domain.BorrowedBook, error)
 	ListBorrow(req *domain.ListBorrowedBookRequest) ([]*domain.BorrowedBook, int64, error)
 	GetBorrow(id string) (*domain.BorrowedBook, error)
-	GetAvailableCopies(bookID string) (int, error)
+	GetAvailableCopies(bookID string) (uint, error)
 	GetBookBorrowByUserID(user_id string) ([]*domain.BorrowedBook, error)
 	IsBookBorrowByUserID(user_id string, book_id string) bool
 	UpdateBorrow(id string, req domain.Map) (*domain.BorrowedBook, error)
