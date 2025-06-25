@@ -94,7 +94,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		book.POST("", handler.CreateBook)
 		book.GET("", handler.ListBook)
 		book.GET("/:id", handler.GetBook)
-		book.PUT("", handler.UpdateBook)
+		book.PUT("/:id", handler.UpdateBook)
 		book.DELETE("/:id", handler.DeleteBook)
 	}
 

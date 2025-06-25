@@ -45,15 +45,15 @@ type BookListRequest struct {
 }
 
 type BookUpdateRequest struct {
-	Title       string `json:"title"`
-	Author      string `json:"author"`
-	ISBN        string `json:"isbn"`
-	Category    string `json:"category"`
-	Program     string `json:"program"`
-	TotalCopies uint   `json:"total_copies"`
-	TotalPages  uint   `json:"total_pages"`
-	Description string `json:"description"`
-	CoverImage  string `json:"cover_image"`
+	Title       *string `json:"title"`
+	Author      *string `json:"author"`
+	ISBN        *string `json:"isbn"`
+	Category    *string `json:"category"`
+	Program     *string `json:"program"`
+	TotalCopies *uint   `json:"total_copies"`
+	TotalPages  *uint   `json:"total_pages"`
+	Description *string `json:"description"`
+	CoverImage  *string `json:"cover_image"`
 }
 
 type BookAllUpdateRequest struct {
@@ -96,5 +96,27 @@ func (r *BookRequest) Validate() error {
 }
 
 func (r *BookUpdateRequest) NewUpdate() Map {
-	return nil
+	mp := map[string]interface{}{}
+	if r.Title != nil {
+		mp["title"] = *r.Title
+	}
+	if r.Author != nil {
+		mp["author"] = *r.Author
+	}
+	if r.ISBN != nil {
+		mp["isbn"] = *r.ISBN
+	}
+	if r.Category != nil {
+		mp["category"] = *r.Category
+	}
+	if r.Program != nil {
+		mp["program"] = *r.Program
+	}
+	if r.TotalCopies != nil {
+		mp["total_copies"] = *r.TotalCopies
+	}
+	if r.TotalPages != nil {
+		mp["total_pages"] = *r.TotalPages
+	}
+	return mp
 }
