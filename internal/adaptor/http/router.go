@@ -111,6 +111,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		report.GET("dashboard-stats", handler.GetLibraryDashboardStats)
 		report.GET("borrowedbookstats", handler.GetBorrowedBookStats)
 		report.GET("program-stats", handler.GetBookProgramstats)
+		report.GET("inventory-stats", handler.GetInventorystats)
 	}
 	borrow := v1.Group("/borrows")
 	{
@@ -126,7 +127,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		fine.POST("", handler.CreateFine)
 		fine.GET("", handler.ListFine)
 		fine.GET("/:id", handler.GetFine)
-		fine.PUT("", handler.UpdateFine)
+		fine.PUT("/:id", handler.UpdateFine)
 		fine.DELETE("/:id", handler.DeleteFine)
 	}
 
@@ -135,7 +136,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		notification.POST("", handler.CreateNotification)
 		notification.GET("", handler.ListNotification)
 		notification.GET("/:id", handler.GetNotification)
-		notification.PUT("", handler.UpdateNotification)
+		notification.PUT("/:id", handler.UpdateNotification)
 		notification.DELETE("/:id", handler.DeleteNotification)
 	}
 

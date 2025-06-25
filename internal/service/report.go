@@ -25,3 +25,11 @@ func (s *Service) GetBookProgramstats() (*[]domain.BookProgramstats, error) {
 	}
 	return result, nil
 }
+
+func (s *Service) GetInventorystats() (*domain.InventoryStats, error) {
+	result, err := s.repo.GetInventorystats()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

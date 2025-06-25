@@ -57,3 +57,20 @@ func (h *Handler) GetBookProgramstats(ctx *gin.Context) {
 	}
 	SuccessResponse(ctx, result)
 }
+
+// GetInventorystats	godoc
+// @Summary 			List Borrow
+// @Tags 				Report
+// @Accept  			json
+// @Produce  			json
+// @Security 			ApiKeyAuth
+// @Success 			200 {array} domain.BookProgramstats
+// @Router 				/reports/inventory-stats	[get]
+func (h *Handler) GetInventorystats(ctx *gin.Context) {
+	result, err := h.svc.GetInventorystats()
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	SuccessResponse(ctx, result)
+}

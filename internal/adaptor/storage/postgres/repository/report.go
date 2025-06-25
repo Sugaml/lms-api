@@ -99,3 +99,41 @@ func (r *Repository) GetBookProgramstats() (*[]domain.BookProgramstats, error) {
 	}
 	return &stats, nil
 }
+
+func (r *Repository) GetInventorystats() (*domain.InventoryStats, error) {
+	var stats domain.InventoryStats
+	var totalBooks int64
+	var borrowedBooks int64
+	var overdueBooks int64
+	var totalStudents int64
+	var activeStudents int64
+	var pendingRequests int64
+	var totalFines int64
+
+	// Queries
+	r.db.Model(&domain.Book{}).Count(&totalBooks)
+	r.db.Model(&domain.BorrowedBook{}).Where("status = ?", "borrowed").Count(&borrowedBooks)
+	r.db.Model(&domain.BorrowedBook{}).Where("status = ?", "overdue").Count(&overdueBooks)
+	r.db.Model(&domain.User{}).Where("role = ?", "student").Count(&totalStudents)
+	r.db.Model(&domain.User{}).Where("role = ? AND is_active = ?", "student", true).Count(&activeStudents)
+	r.db.Model(&domain.BorrowedBook{}).Where("status = ?", "pending").Count(&pendingRequests)
+	r.db.Model(&domain.Fine{}).Where("status = ?", "pending").Select("SUM(amount)").Scan(&totalFines)
+
+	// Available books = sum of all book copies - borrowed books
+	var availableBooks int64
+	r.db.Model(&domain.Book{}).Select("SUM(total_copies)").Scan(&availableBooks)
+	availableBooks = availableBooks - borrowedBooks
+
+	stats = domain.InventoryStats{
+		TotalBooks:      totalBooks,
+		AvailableBooks:  availableBooks,
+		BorrowedBooks:   borrowedBooks,
+		OverdueBooks:    overdueBooks,
+		TotalStudents:   totalStudents,
+		ActiveStudents:  activeStudents,
+		PendingRequests: pendingRequests,
+		TotalFines:      totalFines,
+	}
+
+	return &stats, nil
+}
