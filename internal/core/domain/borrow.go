@@ -68,21 +68,21 @@ type ListBorrowedBookRequest struct {
 }
 
 type BorrowedBookResponse struct {
-	ID           string                 `json:"id"`
-	CreatedAt    time.Time              `json:"created_at"`
-	UserID       string                 `json:"user_id"`
-	BookID       string                 `json:"book_id"`
-	LibrarianID  string                 `json:"librarian_id"`
-	BorrowedDate time.Time              `json:"borrowed_date"`
-	DueDate      time.Time              `json:"due_date"`
-	ReturnedDate *time.Time             `json:"returned_date"`
-	RenewalCount int                    `json:"renewal_count"`
-	Status       string                 `json:"status"` // 'borrowed' | 'returned' | 'overdue'
-	Student      *BorrowStudentResponse `json:"student"`
-	Librarian    *UserResponse          `json:"librarian"`
-	Book         *BorrowBookResponse    `json:"book"`
-	Remarks      string                 `json:"remarks"`
-	IsActive     bool                   `json:"is_active"`
+	ID           string                `json:"id"`
+	CreatedAt    time.Time             `json:"created_at"`
+	UserID       string                `json:"user_id"`
+	BookID       string                `json:"book_id"`
+	LibrarianID  string                `json:"librarian_id"`
+	BorrowedDate time.Time             `json:"borrowed_date"`
+	DueDate      time.Time             `json:"due_date"`
+	ReturnedDate *time.Time            `json:"returned_date"`
+	RenewalCount int                   `json:"renewal_count"`
+	Status       string                `json:"status"` // 'borrowed' | 'returned' | 'overdue'
+	Student      BorrowStudentResponse `json:"student"`
+	Librarian    UserResponse          `json:"librarian"`
+	Book         BorrowBookResponse    `json:"book"`
+	Remarks      string                `json:"remarks"`
+	IsActive     bool                  `json:"is_active"`
 }
 
 func (r BorrowedBookRequest) Validate() error {
