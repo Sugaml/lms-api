@@ -10,7 +10,7 @@ type User struct {
 	BaseModel
 	Username  string `gorm:"unique;not null" json:"username"`
 	Password  string `gorm:"not null" json:"password"`
-	Role      string `gorm:"not null" json:"role"`
+	Role      string `gorm:"not null" json:"role"` // student/librarian
 	Email     string `gorm:"not null" json:"email"`
 	FullName  string `gorm:"column:full_name;not null" json:"full_name"`
 	Program   string `json:"program"`

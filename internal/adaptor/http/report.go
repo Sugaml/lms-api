@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +18,29 @@ import (
 // @Router 			/reports/dashboard-stats	[get]
 func (h *Handler) GetLibraryDashboardStats(ctx *gin.Context) {
 	result, err := h.svc.GetLibraryDashboardStats()
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	SuccessResponse(ctx, result)
+}
+
+// GetMonthlyChartData	godoc
+// @Summary 		MonthlyChartData
+// @Description 	MonthlyChartData
+// @Tags 			Report
+// @Accept  		json
+// @Produce  		json
+// @Security 		ApiKeyAuth
+// @Success 		200 {array} 			domain.ChartData
+// @Router 			/reports/chart-stats	[get]
+func (h *Handler) GetMonthlyChartData(ctx *gin.Context) {
+	today := time.Now()
+	sevenDaysAgo := today.AddDate(0, 0, -7) // inclusive
+
+	startDate := sevenDaysAgo.Format("2006-01-02")
+	endDate := today.Format("2006-01-02")
+	result, err := h.svc.GetDailyChartData(startDate, endDate, "daily")
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return

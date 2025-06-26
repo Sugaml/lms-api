@@ -1430,6 +1430,189 @@ const docTemplate = `{
                 }
             }
         },
+        "/reports/borrowedbookstats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Report"
+                ],
+                "summary": "List Borrow",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.BorrowedBookStats"
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/chart-stats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "MonthlyChartData",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Report"
+                ],
+                "summary": "MonthlyChartData",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.ChartData"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/dashboard-stats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List LibraryDashboard",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Report"
+                ],
+                "summary": "List LibraryDashboard",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.LibraryDashboardStats"
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/inventory-stats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Report"
+                ],
+                "summary": "List Borrow",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.BookProgramstats"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/program-stats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Report"
+                ],
+                "summary": "List Borrow",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.BookProgramstats"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stdents/{id}/borrows": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get Borrow from Student Id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Borrow"
+                ],
+                "summary": "Get Borrow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Borrow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.BorrowedBookResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/students": {
             "post": {
                 "security": [
@@ -1786,6 +1969,17 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.BookProgramstats": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "program": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.BookRequest": {
             "type": "object",
             "properties": {
@@ -1811,6 +2005,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "total_copies": {
+                    "type": "integer"
+                },
+                "total_pages": {
                     "type": "integer"
                 }
             }
@@ -1879,6 +2076,37 @@ const docTemplate = `{
                 },
                 "total_copies": {
                     "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.BorrowBookResponse": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "cover_image": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.BorrowStudentResponse": {
+            "type": "object",
+            "properties": {
+                "full_name": {
+                    "type": "string"
+                },
+                "program": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "string"
                 }
             }
         },
@@ -1897,6 +2125,9 @@ const docTemplate = `{
                 "returned_date": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "string"
+                },
                 "user_id": {
                     "type": "string"
                 }
@@ -1906,7 +2137,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "book": {
-                    "$ref": "#/definitions/domain.BookResponse"
+                    "$ref": "#/definitions/domain.BorrowBookResponse"
                 },
                 "book_id": {
                     "type": "string"
@@ -1922,6 +2153,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
                 },
                 "librarian": {
                     "$ref": "#/definitions/domain.UserResponse"
@@ -1943,10 +2177,27 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "student": {
-                    "$ref": "#/definitions/domain.UserResponse"
+                    "$ref": "#/definitions/domain.BorrowStudentResponse"
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "domain.BorrowedBookStats": {
+            "type": "object",
+            "properties": {
+                "dueSoon": {
+                    "type": "integer"
+                },
+                "pendingRequests": {
+                    "type": "integer"
+                },
+                "totalBorrowedBooks": {
+                    "type": "integer"
+                },
+                "totalOverdueBooks": {
+                    "type": "integer"
                 }
             }
         },
@@ -2025,6 +2276,35 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.ChartData": {
+            "type": "object",
+            "properties": {
+                "booksAdded": {
+                    "type": "integer"
+                },
+                "borrowed": {
+                    "type": "integer"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "due": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "string"
+                },
+                "requests": {
+                    "type": "integer"
+                },
+                "returned": {
+                    "type": "integer"
+                },
+                "totalStudents": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.FineRequest": {
             "type": "object",
             "properties": {
@@ -2083,6 +2363,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.LibraryDashboardStats": {
+            "type": "object",
+            "properties": {
+                "activeStudents": {
+                    "type": "integer"
+                },
+                "availableBooks": {
+                    "type": "integer"
+                },
+                "borrowedBooks": {
+                    "type": "integer"
+                },
+                "overdueBooks": {
+                    "type": "integer"
+                },
+                "pendingRequests": {
+                    "type": "integer"
+                },
+                "totalBooks": {
+                    "type": "integer"
+                },
+                "totalFines": {
+                    "type": "integer"
+                },
+                "totalStudents": {
                     "type": "integer"
                 }
             }

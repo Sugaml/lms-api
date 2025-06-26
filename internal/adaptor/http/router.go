@@ -117,6 +117,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	report := v1.Group("/reports")
 	{
 		report.GET("dashboard-stats", handler.GetLibraryDashboardStats)
+		report.GET("chart-stats", handler.GetMonthlyChartData)
 		report.GET("borrowedbookstats", handler.GetBorrowedBookStats)
 		report.GET("program-stats", handler.GetBookProgramstats)
 		report.GET("inventory-stats", handler.GetInventorystats)

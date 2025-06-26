@@ -10,6 +10,21 @@ func (s *Service) GetLibraryDashboardStats() (*domain.LibraryDashboardStats, err
 	return result, nil
 }
 
+func (s *Service) GetMonthlyChartData() ([]domain.ChartData, error) {
+	result, err := s.repo.GetMonthlyChartData()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (s *Service) GetDailyChartData(startDate, endDate, rangeType string) ([]domain.ChartData, error) {
+	result, err := s.repo.GetDailyChartData(startDate, endDate, rangeType)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (s *Service) GetBorrowedBookStats() (*domain.BorrowedBookStats, error) {
 	result, err := s.repo.GetBorrowedBookStats()
 	if err != nil {

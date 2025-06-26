@@ -11,6 +11,17 @@ type LibraryDashboardStats struct {
 	TotalStudents   int64 `json:"totalStudents"`
 }
 
+type ChartData struct {
+	Month         string `json:"month"`
+	Date          string `json:"date"`
+	Borrowed      int    `json:"borrowed"`
+	Returned      int    `json:"returned"`
+	Due           int    `json:"due"`
+	Requests      int    `json:"requests"`
+	TotalStudents int    `json:"totalStudents"`
+	BooksAdded    int    `json:"booksAdded"`
+}
+
 type BorrowedBookStats struct {
 	TotalBorrowedBooks int64 `json:"totalBorrowedBooks"`
 	TotalOverdueBooks  int64 `json:"totalOverdueBooks"`
