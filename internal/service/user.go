@@ -122,6 +122,18 @@ func (s *Service) DeleteUser(id string) (*domain.UserResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	if result.Role == "admin" {
+		return nil, errors.New("cannot delete admin user")
+	}
+	if result.Role == "student" {
+		CountBorrwedCopiesUserID, err := s.repo.CountBorrwedCopiesUserID(id)
+		if err != nil {
+			return nil, err
+		}
+		if CountBorrwedCopiesUserID > 0 {
+			return nil, fmt.Errorf("user has %d copies borrowed cannot delete it", CountBorrwedCopiesUserID)
+		}
+	}
 	err = s.repo.DeleteUser(id)
 	if err != nil {
 		return nil, err

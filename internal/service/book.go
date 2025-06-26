@@ -81,6 +81,13 @@ func (s *Service) DeleteBook(id string) (*domain.BookResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	CountBorrwedCopiesBookID, err := s.repo.CountBorrwedCopiesBookID(id)
+	if err != nil {
+		return nil, err
+	}
+	if CountBorrwedCopiesBookID > 0 {
+		return nil, fmt.Errorf("book has %d copies borrowed cannot delete it", CountBorrwedCopiesBookID)
+	}
 	err = s.repo.DeleteBook(id)
 	if err != nil {
 		return nil, err

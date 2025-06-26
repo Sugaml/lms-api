@@ -12,6 +12,9 @@ type BorrowRepository interface {
 	GetAvailableCopies(bookID string) (uint, error)
 	GetBookBorrowByUserID(user_id string) ([]*domain.BorrowedBook, error)
 	IsBookBorrowByUserID(user_id string, book_id string) bool
+	CountAllBookBorrwedCopies() (int64, error)
+	CountBorrwedCopiesBookID(bookID string) (int64, error)
+	CountBorrwedCopiesUserID(userID string) (int64, error)
 	UpdateBorrow(id string, req domain.Map) (*domain.BorrowedBook, error)
 	DeleteBorrow(id string) error
 }

@@ -90,6 +90,39 @@ func (r *Repository) GetAvailableCopies(bookID string) (uint, error) {
 	return availableCopies, nil
 }
 
+func (r *Repository) CountAllBookBorrwedCopies() (int64, error) {
+	// Count currently borrowed copies
+	var borrowedCount int64
+	if err := r.db.Model(&domain.BorrowedBook{}).
+		Where("status = ?", "borrowed").
+		Count(&borrowedCount).Error; err != nil {
+		return 0, err
+	}
+	return borrowedCount, nil
+}
+
+func (r *Repository) CountBorrwedCopiesBookID(bookID string) (int64, error) {
+	// Count currently borrowed copies
+	var borrowedCount int64
+	if err := r.db.Model(&domain.BorrowedBook{}).
+		Where("user_id = ? AND status = ?", bookID, "borrowed").
+		Count(&borrowedCount).Error; err != nil {
+		return 0, err
+	}
+	return borrowedCount, nil
+}
+
+func (r *Repository) CountBorrwedCopiesUserID(userID string) (int64, error) {
+	// Count currently borrowed copies
+	var borrowedCount int64
+	if err := r.db.Model(&domain.BorrowedBook{}).
+		Where("user_id = ? AND status = ?", userID, "borrowed").
+		Count(&borrowedCount).Error; err != nil {
+		return 0, err
+	}
+	return borrowedCount, nil
+}
+
 func (r *Repository) IsBookBorrowByUserID(userID string, bookID string) bool {
 	var count int64
 	err := r.db.Model(&domain.BorrowedBook{}).
