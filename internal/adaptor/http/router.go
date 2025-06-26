@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sugaml/lms-api/internal/adaptor/config"
+	"github.com/sugaml/lms-api/internal/adaptor/storage/uploader"
 	"github.com/sugaml/lms-api/internal/core/auth"
 	"github.com/sugaml/lms-api/internal/core/port"
 
@@ -15,14 +16,16 @@ type Handler struct {
 	svc        port.Service
 	config     config.Config
 	tokenMaker auth.Maker
+	uploader   uploader.FileUploader
 }
 
 // NewHandler creates a new Handler instance
-func NewHandler(svc port.Service, config config.Config, tokenMaker auth.Maker) *Handler {
+func NewHandler(svc port.Service, config config.Config, tokenMaker auth.Maker, uploader uploader.FileUploader) *Handler {
 	return &Handler{
 		svc,
 		config,
 		tokenMaker,
+		uploader,
 	}
 }
 
@@ -50,6 +53,11 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	{
 		user.POST("", handler.CreateUser)
 		user.POST("/login", handler.LoginUser)
+	}
+
+	upload := v1.Group("/uploads")
+	{
+		upload.POST("", handler.UploadFile)
 	}
 
 	v1.Use(authMiddleware(handler.tokenMaker))

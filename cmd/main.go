@@ -20,8 +20,9 @@ import (
 	"github.com/sugaml/lms-api/internal/adaptor/http"
 	"github.com/sugaml/lms-api/internal/adaptor/storage/postgres"
 	"github.com/sugaml/lms-api/internal/adaptor/storage/postgres/repository"
+	"github.com/sugaml/lms-api/internal/adaptor/storage/uploader"
 	"github.com/sugaml/lms-api/internal/core/auth"
-	"github.com/sugaml/lms-api/internal/service"
+	"github.com/sugaml/lms-api/internal/core/service"
 )
 
 // @title						LMS API
@@ -51,7 +52,8 @@ func main() {
 		logrus.WithError(err).Fatal("Error initializing token maker")
 	}
 	svc := service.NewService(repo, tokenMaker)
-	handler := http.NewHandler(svc, config, tokenMaker)
+	uploader, err := uploader.GetUploader()
+	handler := http.NewHandler(svc, config, tokenMaker, uploader)
 
 	// Init router
 	router, err := http.NewRouter(

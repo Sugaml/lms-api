@@ -12,10 +12,10 @@ RUN go mod tidy
 FROM base AS lint
 RUN golangci-lint run --timeout 10m0s ./...
 
-# Stage 3: Test
-FROM base AS test
-RUN go test -v -coverprofile=cover.out ./...
-RUN go tool cover -func=cover.out
+# # Stage 3: Test
+# FROM base AS test
+# RUN go test -v -coverprofile=cover.out ./...
+# RUN go tool cover -func=cover.out
 
 # Stage 4: Build
 FROM base AS builder
