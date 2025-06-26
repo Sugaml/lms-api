@@ -57,6 +57,16 @@ func (r *Repository) GetUser(id string) (*domain.User, error) {
 	}
 	return &data, nil
 }
+
+func (r *Repository) GetStudentbyID(studentID string) (*domain.User, error) {
+	var data domain.User
+	if err := r.db.Model(&domain.User{}).
+		Take(&data, "student_id = ? and role = ?", studentID, "student").Error; err != nil {
+		return nil, err
+	}
+	return &data, nil
+}
+
 func (r *Repository) GetUserbyUsername(username string) (*domain.User, error) {
 	var data domain.User
 	if err := r.db.Model(&domain.User{}).

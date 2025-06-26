@@ -19,6 +19,12 @@ func (s *Service) CreateUser(req *domain.UserRequest) (*domain.UserResponse, err
 	if err != nil {
 		return nil, err
 	}
+	if data.Role == "student" {
+		studentExist, err := s.repo.GetStudentbyID(data.StudentID)
+		if studentExist != nil && err == nil {
+			return nil, errors.New("student already exist")
+		}
+	}
 	result, err := s.repo.CreateUser(data)
 	if err != nil {
 		return nil, err

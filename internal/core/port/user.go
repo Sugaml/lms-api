@@ -10,6 +10,7 @@ type UserRepository interface {
 	ListUser(req *domain.UserListRequest) ([]*domain.User, int64, error)
 	ListStudent(req *domain.UserListRequest) ([]*domain.User, int64, error)
 	GetUser(id string) (*domain.User, error)
+	GetStudentbyID(studentID string) (*domain.User, error)
 	GetUserbyUsername(username string) (*domain.User, error)
 	UpdateUser(id string, req domain.Map) (*domain.User, error)
 	DeleteUser(id string) error
