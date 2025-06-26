@@ -105,7 +105,7 @@ func (r *Repository) CountBorrwedCopiesBookID(bookID string) (int64, error) {
 	// Count currently borrowed copies
 	var borrowedCount int64
 	if err := r.db.Model(&domain.BorrowedBook{}).
-		Where("user_id = ? AND status = ?", bookID, "borrowed").
+		Where("book_id = ? AND status = ?", bookID, "borrowed").
 		Count(&borrowedCount).Error; err != nil {
 		return 0, err
 	}

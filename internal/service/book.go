@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
@@ -85,6 +86,7 @@ func (s *Service) DeleteBook(id string) (*domain.BookResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	logrus.Info("CountBorrwedCopiesBookID :: ", CountBorrwedCopiesBookID)
 	if CountBorrwedCopiesBookID > 0 {
 		return nil, fmt.Errorf("book has %d copies borrowed cannot delete it", CountBorrwedCopiesBookID)
 	}

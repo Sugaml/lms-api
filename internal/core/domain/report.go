@@ -33,3 +33,14 @@ type InventoryStats struct {
 	PendingRequests int64 `json:"pendingRequests"`
 	TotalFines      int64 `json:"totalFines"`
 }
+
+type DashboardStats struct {
+	TotalBooks      int `json:"totalBooks"`
+	AvailableBooks  int `json:"availableBooks"`
+	BorrowedBooks   int `json:"borrowedBooks"`
+	OverdueBooks    int `json:"overdueBooks"`
+	TotalStudents   int `json:"totalStudents"`
+	ActiveStudents  int `json:"activeStudents"`
+	PendingRequests int `json:"pendingRequests"`
+	TotalFines      int `json:"totalFines"`
+}
