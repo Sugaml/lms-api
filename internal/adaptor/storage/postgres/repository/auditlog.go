@@ -15,6 +15,7 @@ func (r *Repository) CreateAuditLog(data *domain.AuditLog) (*domain.AuditLog, er
 
 func (r *Repository) ListAuditLog(req *domain.ListAuditLogRequest) ([]*domain.AuditLog, int64, error) {
 	var datas []*domain.AuditLog
+	var count int64
 	f := r.db.Model(&domain.AuditLog{})
 	if req.Query != "" {
 		f = f.Where("lower(title) LIKE lower(?)", "%"+req.Query+"%")
@@ -25,11 +26,15 @@ func (r *Repository) ListAuditLog(req *domain.ListAuditLogRequest) ([]*domain.Au
 	if req.Action != "" {
 		f = f.Where("action = ?", req.Action)
 	}
-	err := f.Find(&datas).Error
+	err := f.Count(&count).
+		Order(req.SortColumn + " " + req.SortDirection).
+		Limit(req.Size).
+		Offset(req.Size * (req.Page - 1)).
+		Find(&datas).Error
 	if err != nil {
-		return nil, 0, err
+		return nil, count, err
 	}
-	return datas, 0, nil
+	return datas, count, nil
 }
 
 func (r *Repository) GetAuditLog(id string) (*domain.AuditLog, error) {

@@ -45,7 +45,7 @@ type AuditLogRequest struct {
 type AuditLogResponse struct {
 	ID          string    `json:"id"`
 	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Module      string    `json:"module,omitempty"`
 	Title       string    `json:"title,omitempty"`
 	UserID      string    `json:"user_id,omitempty"`
 	Action      string    `json:"action,omitempty"`       // The action performed (e.g., "CREATE", "UPDATE", "DELETE")

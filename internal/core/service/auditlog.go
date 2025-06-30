@@ -23,6 +23,7 @@ func (s *Service) CreateAuditLog(req *domain.AuditLogRequest) (*domain.AuditLogR
 // ListAuditLogs retrieves a list of AuditLogs
 func (s *Service) ListAuditLog(req *domain.ListAuditLogRequest) ([]*domain.AuditLogResponse, int64, error) {
 	var datas = []*domain.AuditLogResponse{}
+	req.Size = 5
 	results, count, err := s.repo.ListAuditLog(req)
 	if err != nil {
 		return nil, count, err

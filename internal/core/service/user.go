@@ -84,6 +84,11 @@ func (s *Service) ListStudent(req *domain.UserListRequest) ([]*domain.StudentRes
 	}
 	for _, result := range results {
 		data := domain.Convert[domain.User, domain.StudentResponse](result)
+		if result.IsActive {
+			data.Status = "warning"
+		} else {
+			data.Status = "overdue"
+		}
 		datas = append(datas, data)
 	}
 	return datas, count, nil
