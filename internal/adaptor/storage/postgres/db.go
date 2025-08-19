@@ -46,6 +46,7 @@ func NewDB(config config.Config) (*gorm.DB, error) {
 			&domain.BorrowedBook{},
 			&domain.Category{},
 			&domain.Program{},
+			&domain.Notification{},
 		)
 		if err != nil {
 			return nil, err

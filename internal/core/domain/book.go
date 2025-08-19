@@ -12,6 +12,7 @@ type Book struct {
 	ISBN        string `gorm:"unique;not null" json:"isbn"`
 	Category    string `gorm:"not null" json:"category"`
 	CategoryID  string `gorm:"not null" json:"category_id"`
+	AssertionID string `gorm:"null" json:"assertion_id"`
 	Program     string `gorm:"not null" json:"program"`
 	TotalCopies uint   `gorm:"not null" json:"total_copies"`
 	Description string `gorm:"not null" json:"description"`
@@ -26,6 +27,7 @@ type BookRequest struct {
 	ISBN        string `json:"isbn"`
 	Category    string `json:"category"`
 	Program     string `json:"program"`
+	AssertionID string `json:"assertion_id"`
 	TotalCopies uint   `json:"total_copies"`
 	TotalPages  uint   `json:"total_pages"`
 	Description string `json:"description"`
@@ -38,6 +40,7 @@ type BookListRequest struct {
 	Author      string `form:"author"`
 	ISBN        string `form:"isbn"`
 	Category    string `form:"category"`
+	AssertionID string `json:"assertion_id"`
 	Program     string `form:"program"`
 	TotalCopies uint   `form:"total_copies"`
 	Description string `form:"description"`
@@ -50,6 +53,7 @@ type BookUpdateRequest struct {
 	ISBN        *string `json:"isbn"`
 	Category    *string `json:"category"`
 	Program     *string `json:"program"`
+	AssertionID string  `json:"assertion_id"`
 	TotalCopies *uint   `json:"total_copies"`
 	TotalPages  *uint   `json:"total_pages"`
 	Description *string `json:"description"`
@@ -62,6 +66,7 @@ type BookAllUpdateRequest struct {
 	ISBN            string `json:"isbn"`
 	Category        string `json:"category"`
 	Program         string `json:"program"`
+	AssertionID     string `json:"assertion_id"`
 	TotalCopies     int    `json:"total_copies"`
 	AvailableCopies int    `json:"available_copies"`
 	Description     string `json:"description"`
@@ -76,6 +81,7 @@ type BookResponse struct {
 	ISBN            string    `json:"isbn"`
 	Category        string    `json:"category"`
 	Program         string    `json:"program"`
+	AssertionID     string    `json:"assertion_id"`
 	TotalCopies     uint      `json:"total_copies"`
 	AvailableCopies uint      `json:"available_copies"`
 	Description     string    `json:"description"`

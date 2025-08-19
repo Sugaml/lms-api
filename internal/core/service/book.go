@@ -19,6 +19,14 @@ func (s *Service) CreateBook(req *domain.BookRequest) (*domain.BookResponse, err
 	if err != nil {
 		return nil, err
 	}
+	_, _ = s.repo.CreateNotification(&domain.Notification{
+		Title:       fmt.Sprintf("Created new %s Book.", result.Title),
+		Description: "create",
+		Type:        "book",
+		Action:      "create",
+		Module:      "book",
+		IsActive:    true,
+	})
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("Created new Book %s.", result.Title),
 		Action:   "create",
@@ -67,6 +75,14 @@ func (s *Service) UpdateBook(id string, req *domain.BookUpdateRequest) (*domain.
 	if err != nil {
 		return nil, err
 	}
+	_, _ = s.repo.CreateNotification(&domain.Notification{
+		Title:       fmt.Sprintf("Updated %s Book details.", result.Title),
+		Description: "update",
+		Type:        "book",
+		Action:      "update",
+		Module:      "book",
+		IsActive:    true,
+	})
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("Updated %s Book details.", result.Title),
 		Action:   "update",

@@ -5,7 +5,9 @@ type Notification struct {
 	UserID      int    `gorm:"not null" json:"user_id"`
 	Title       string `gorm:"not null" json:"title"`
 	Description string `gorm:"not null" json:"description"`
-	Type        string `gorm:"not null" json:"type"` // 'due_reminder' | 'fine' | 'request_approved' | 'general'
+	Module      string `gorm:"not null" json:"module"` // 'book' | 'program' | 'user' | 'general'
+	Action      string `gorm:"not null" json:"action"` // 'create' | 'update' | 'delete'
+	Type        string `gorm:"not null" json:"type"`
 	IsRead      bool   `gorm:"column:is_read;default:false" json:"is_read"`
 	IsActive    bool   `gorm:"column:is_active;default:false" json:"is_active"`
 }
@@ -41,8 +43,10 @@ type NotificationResponse struct {
 	BaseModel
 	UserID      int    `json:"user_id"`
 	Title       string `json:"title"`
-	Description string `json:"description" `
-	Type        string `json:"type"` // 'due_reminder' | 'fine' | 'request_approved' | 'general'
+	Description string `json:"description"`
+	Module      string `json:"module"`
+	Action      string `json:"action"`
+	Type        string `json:"type"`
 	IsRead      bool   `json:"is_read"`
 }
 

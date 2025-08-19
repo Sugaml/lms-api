@@ -37,7 +37,6 @@ func (h *Handler) GetLibraryDashboardStats(ctx *gin.Context) {
 func (h *Handler) GetMonthlyChartData(ctx *gin.Context) {
 	today := time.Now()
 	sevenDaysAgo := today.AddDate(0, 0, -7) // inclusive
-
 	startDate := sevenDaysAgo.Format("2006-01-02")
 	endDate := today.Format("2006-01-02")
 	result, err := h.svc.GetDailyChartData(startDate, endDate, "daily")
