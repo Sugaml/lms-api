@@ -12,6 +12,7 @@ type User struct {
 	Password  string `gorm:"not null" json:"password"`
 	Role      string `gorm:"not null" json:"role"` // student/librarian
 	Email     string `gorm:"not null" json:"email"`
+	Image     string `json:"image"`
 	FullName  string `gorm:"column:full_name;not null" json:"full_name"`
 	Program   string `json:"program"`
 	StudentID string `gorm:"column:student_id" json:"student_id"`
@@ -23,6 +24,7 @@ type UserRequest struct {
 	Password  string `json:"password"`
 	Role      string `json:"role"`
 	Email     string `json:"email"`
+	Image     string `json:"image"`
 	FullName  string `json:"full_name"`
 	Program   string `json:"program"`
 	StudentID string `json:"student_id"`
@@ -35,6 +37,7 @@ type UserListRequest struct {
 	Role      string `form:"role"`
 	Email     string `form:"email"`
 	FullName  string `form:"full_name"`
+	Image     string `json:"image"`
 	Program   string `form:"program"`
 	StudentID string `form:"student_id"`
 }
@@ -45,6 +48,7 @@ type UserAllUpdateRequest struct {
 	Role      string `json:"role"`
 	Email     string `json:"email"`
 	FullName  string `json:"full_name"`
+	Image     string `json:"image"`
 	Program   string `json:"program"`
 	StudentID string `json:"student_id"`
 }
@@ -64,6 +68,7 @@ type UserUpdateRequest struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Role      string `json:"role"`
+	Image     string `json:"image"`
 	Email     string `json:"email"`
 	FullName  string `json:"full_name"`
 	Program   string `json:"program"`
@@ -76,6 +81,7 @@ type UserResponse struct {
 	Username  string    `json:"username"`
 	Role      string    `json:"role"`
 	Email     string    `json:"email"`
+	Image     string    `json:"image"`
 	FullName  string    `json:"full_name"`
 	Program   string    `json:"program"`
 	StudentID string    `json:"student_id"`
@@ -88,6 +94,7 @@ type StudentResponse struct {
 	Email         string `json:"email"`
 	StudentID     string `json:"student_id"`
 	Program       string `json:"program"`
+	Image         string `json:"image"`
 	BorrowedCount int    `json:"borrowed_count" default:"10"`
 	OverdueCount  int    `json:"overdue_count"  default:"10"`
 	Fines         int    `json:"fines"  default:"10"`
@@ -111,6 +118,9 @@ func (u *UserRequest) Validate() error {
 	if u.FullName == "" {
 		return errors.New("full name is required")
 	}
+	if u.Image == "" {
+		return errors.New("image is required")
+	}
 	if u.Role == "Student" {
 		if u.Program == "" {
 			return errors.New("program is required")
@@ -125,6 +135,24 @@ func (u *UserRequest) Validate() error {
 func (r *UserUpdateRequest) NewUpdate() Map {
 	if r.Username != "" {
 		return Map{"username": r.Username}
+	}
+	if r.Image != "" {
+		return Map{"image": r.Image}
+	}
+	if r.Password != "" {
+		return Map{"password": r.Password}
+	}
+	if r.Role != "" {
+		return Map{"role": r.Role}
+	}
+	if r.Email != "" {
+		return Map{"email": r.Email}
+	}
+	if r.FullName != "" {
+		return Map{"full_name": r.FullName}
+	}
+	if r.Program != "" {
+		return Map{"program": r.Program}
 	}
 	return nil
 }

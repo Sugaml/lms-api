@@ -66,7 +66,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	{
 		userAuth.GET("", handler.ListUser)
 		userAuth.GET("/:id", handler.GetUser)
-		userAuth.PUT("", handler.UpdateUser)
+		userAuth.PUT("/:id", handler.UpdateUser)
 		userAuth.DELETE("/:id", handler.DeleteUser)
 	}
 

@@ -41,5 +41,7 @@ func (h *Handler) UploadFile(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
-	SuccessResponse(ctx, result)
+	SuccessResponse(ctx, map[string]string{
+		"url": result,
+	})
 }
