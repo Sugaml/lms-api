@@ -11,6 +11,12 @@ type LibraryDashboardStats struct {
 	TotalStudents   int64 `json:"totalStudents"`
 }
 
+type ChartRequest struct {
+	StartDate string `form:"start_date"`
+	EndDate   string `form:"end_date"`
+	Range     string `form:"range"`
+}
+
 type ChartData struct {
 	Month         string `json:"month"`
 	Date          string `json:"date"`

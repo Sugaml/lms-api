@@ -17,8 +17,8 @@ func (s *Service) GetMonthlyChartData() ([]domain.ChartData, error) {
 	}
 	return result, nil
 }
-func (s *Service) GetDailyChartData(startDate, endDate, rangeType string) ([]domain.ChartData, error) {
-	result, err := s.repo.GetDailyChartData(startDate, endDate, rangeType)
+func (s *Service) GetDailyChartData(req *domain.ChartRequest) ([]domain.ChartData, error) {
+	result, err := s.repo.GetDailyChartData(req)
 	if err != nil {
 		return nil, err
 	}

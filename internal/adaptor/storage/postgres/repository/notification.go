@@ -53,6 +53,15 @@ func (r *Repository) UpdateNotification(id string, req domain.Map) (*domain.Noti
 	return data, nil
 }
 
+func (r *Repository) ReadAllNotification(req domain.Map) (*domain.Notification, error) {
+	data := &domain.Notification{}
+	err := r.db.Model(&domain.Notification{}).Where("is_read = ?", false).Updates(req.ToMap()).Take(&data).Error
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 func (r *Repository) DeleteNotification(id string) error {
 	return r.db.Model(&domain.Notification{}).Where("id = ?", id).Delete(&domain.Notification{}).Error
 }

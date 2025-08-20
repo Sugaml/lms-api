@@ -10,6 +10,7 @@ type NotificationRepository interface {
 	ListNotification(req *domain.ListNotificationRequest) ([]*domain.Notification, int64, error)
 	GetNotification(id string) (*domain.Notification, error)
 	UpdateNotification(id string, req domain.Map) (*domain.Notification, error)
+	ReadAllNotification(req domain.Map) (*domain.Notification, error)
 	DeleteNotification(id string) error
 }
 
@@ -19,5 +20,6 @@ type NotificationService interface {
 	ListNotification(req *domain.ListNotificationRequest) ([]*domain.NotificationResponse, int64, error)
 	GetNotification(id string) (*domain.NotificationResponse, error)
 	UpdateNotification(id string, req *domain.UpdateNotificationRequest) (*domain.NotificationResponse, error)
+	ReadAllNotification() (*domain.NotificationResponse, error)
 	DeleteNotification(id string) (*domain.NotificationResponse, error)
 }

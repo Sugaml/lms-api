@@ -132,22 +132,105 @@ func (r *Repository) GetMonthlyChartData() ([]domain.ChartData, error) {
 
 	return results, nil
 }
+func (r *Repository) GetDailyChartData(req *domain.ChartRequest) ([]domain.ChartData, error) {
+	var startDate, endDate time.Time
+	var err error
 
-func (r *Repository) GetDailyChartData(startDateStr, endDateStr, rangeType string) ([]domain.ChartData, error) {
-	var results []domain.ChartData
-
-	startDate, err := time.Parse("2006-01-02", startDateStr)
-	if err != nil {
-		return nil, err
+	// Parse provided dates if available
+	if req.StartDate != "" {
+		startDate, err = time.Parse("2006-01-02", req.StartDate)
+		if err != nil {
+			return nil, fmt.Errorf("invalid start date: %w", err)
+		}
 	}
-	endDate, err := time.Parse("2006-01-02", endDateStr)
-	if err != nil {
-		return nil, err
+	if req.EndDate != "" {
+		endDate, err = time.Parse("2006-01-02", req.EndDate)
+		if err != nil {
+			return nil, fmt.Errorf("invalid end date: %w", err)
+		}
 	}
 
-	type TempData struct {
-		Label         string
-		GroupKey      string
+	// Set defaults if not provided
+	switch req.Range {
+	case "daily":
+		if req.StartDate == "" || req.EndDate == "" {
+			endDate = time.Now()
+			startDate = endDate.AddDate(0, 0, -7) // last 7 days
+		}
+	case "weekly":
+		if req.StartDate == "" || req.EndDate == "" {
+			endDate = time.Now()
+			startDate = endDate.AddDate(0, 0, -30) // last ~4 weeks
+		}
+	case "monthly":
+		if req.StartDate == "" || req.EndDate == "" {
+			endDate = time.Now()
+			startDate = endDate.AddDate(0, -12, 0) // last 12 months
+		}
+	case "yearly":
+		if req.StartDate == "" || req.EndDate == "" {
+			endDate = time.Now()
+			startDate = endDate.AddDate(-5, 0, 0) // last 5 years
+		}
+	default:
+		return nil, fmt.Errorf("unsupported range: %s", req.Range)
+	}
+
+	// Date formatting for SQL
+	startDateStr := startDate.Format("2006-01-02")
+	endDateStr := endDate.Format("2006-01-02")
+
+	// Pick grouping based on range
+	groupExpr := "TO_CHAR(borrowed_date, 'YYYY-MM-DD')" // daily
+	switch req.Range {
+	case "weekly":
+		groupExpr = "TO_CHAR(borrowed_date, 'IYYY-IW')" // ISO week
+	case "monthly":
+		groupExpr = "TO_CHAR(borrowed_date, 'YYYY-MM')"
+	case "yearly":
+		groupExpr = "TO_CHAR(borrowed_date, 'YYYY')"
+	}
+
+	// SQL query: join three summaries (borrow, student, books)
+	query := fmt.Sprintf(`
+		WITH borrow_summary AS (
+			SELECT %s AS grp,
+			       COUNT(CASE WHEN status = 'borrowed' THEN 1 END) AS borrowed,
+			       COUNT(CASE WHEN status = 'returned' THEN 1 END) AS returned,
+			       COUNT(CASE WHEN status = 'due' THEN 1 END) AS due,
+			       COUNT(CASE WHEN status = 'requested' THEN 1 END) AS requests
+			FROM borrowed_books
+			WHERE borrowed_date BETWEEN ? AND ?
+			GROUP BY grp
+		),
+		student_summary AS (
+			SELECT %s AS grp,
+			       COUNT(*) AS total_students
+			FROM users
+			WHERE created_at BETWEEN ? AND ?
+			GROUP BY grp
+		),
+		book_summary AS (
+			SELECT %s AS grp,
+			       COUNT(*) AS books_added
+			FROM books
+			WHERE created_at BETWEEN ? AND ?
+			GROUP BY grp
+		)
+		SELECT COALESCE(b.grp, s.grp, bk.grp) AS grp,
+		       COALESCE(b.borrowed, 0) AS borrowed,
+		       COALESCE(b.returned, 0) AS returned,
+		       COALESCE(b.due, 0) AS due,
+		       COALESCE(b.requests, 0) AS requests,
+		       COALESCE(s.total_students, 0) AS total_students,
+		       COALESCE(bk.books_added, 0) AS books_added
+		FROM borrow_summary b
+		FULL OUTER JOIN student_summary s ON b.grp = s.grp
+		FULL OUTER JOIN book_summary bk ON COALESCE(b.grp, s.grp) = bk.grp
+	`, groupExpr, groupExpr, groupExpr)
+
+	type Temp struct {
+		Grp           string
 		Borrowed      int
 		Returned      int
 		Due           int
@@ -155,119 +238,85 @@ func (r *Repository) GetDailyChartData(startDateStr, endDateStr, rangeType strin
 		TotalStudents int
 		BooksAdded    int
 	}
+	var rawData []Temp
 
-	// Properly quoted format strings for TO_CHAR()
-	var labelFmt, groupFmt string
-
-	switch rangeType {
-	case "daily":
-		labelFmt = "'Dy DD'"
-		groupFmt = "YYYY-MM-DD"
-	case "monthly":
-		labelFmt = "'Mon'"
-		groupFmt = "YYYY-MM"
-	case "yearly":
-		labelFmt = "'YYYY'"
-		groupFmt = "YYYY"
-	case "weekly", "":
-		fallthrough
-	default:
-		labelFmt = "'Wk ''IW'" // escaped single quotes for 'Wk 'IW'
-		groupFmt = "IYYY-IW"
-	}
-
-	query := fmt.Sprintf(`
-		WITH borrow_summary AS (
-			SELECT 
-				TO_CHAR(borrowed_date, %s) AS label,
-				TO_CHAR(borrowed_date, '%s') AS group_key,
-				COUNT(*) FILTER (WHERE status = 'borrowed') AS borrowed,
-				COUNT(*) FILTER (WHERE status = 'returned') AS returned,
-				COUNT(*) FILTER (WHERE status = 'overdue') AS due,
-				COUNT(*) FILTER (WHERE status = 'pending') AS requests
-			FROM borrowed_books
-			WHERE borrowed_date BETWEEN ? AND ?
-			GROUP BY group_key, label
-		),
-		student_summary AS (
-			SELECT 
-				TO_CHAR(created_at, '%s') AS group_key,
-				COUNT(*) AS total_students
-			FROM users
-			WHERE role = 'student' AND created_at BETWEEN ? AND ?
-			GROUP BY group_key
-		),
-		book_summary AS (
-			SELECT 
-				TO_CHAR(created_at, '%s') AS group_key,
-				COUNT(*) AS books_added
-			FROM books
-			WHERE created_at BETWEEN ? AND ?
-			GROUP BY group_key
-		)
-		SELECT 
-			bs.label,
-			bs.group_key,
-			bs.borrowed,
-			bs.returned,
-			bs.due,
-			bs.requests,
-			COALESCE(ss.total_students, 0) AS total_students,
-			COALESCE(bo.books_added, 0) AS books_added
-		FROM borrow_summary bs
-		LEFT JOIN student_summary ss ON ss.group_key = bs.group_key
-		LEFT JOIN book_summary bo ON bo.group_key = bs.group_key
-		ORDER BY bs.group_key ASC
-	`, labelFmt, groupFmt, groupFmt, groupFmt)
-
-	var rawData []TempData
-
-	err = r.db.Raw(query, startDateStr, endDateStr, startDateStr, endDateStr, startDateStr, endDateStr).Scan(&rawData).Error
+	err = r.db.Raw(
+		query,
+		startDateStr, endDateStr, // borrow
+		startDateStr, endDateStr, // students
+		startDateStr, endDateStr, // books
+	).Scan(&rawData).Error
 	if err != nil {
 		return nil, err
 	}
 
-	// Map group_key => TempData for easy lookup
-	dataMap := make(map[string]TempData)
+	// Build map for quick lookup
+	dataMap := make(map[string]Temp)
 	for _, row := range rawData {
-		dataMap[row.GroupKey] = row
+		dataMap[row.Grp] = row
 	}
 
-	// If daily range, fill missing days with zeroes
-	if rangeType == "daily" {
+	// Fill response
+	var result []domain.ChartData
+
+	switch req.Range {
+	case "daily":
 		for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
-			key := d.Format("2006-01-02")
-			label := d.Format("Mon 02")
-			if row, found := dataMap[key]; found {
-				results = append(results, domain.ChartData{
-					Month:         row.Label,
-					Date:          row.GroupKey,
-					Borrowed:      row.Borrowed,
-					Returned:      row.Returned,
-					Due:           row.Due,
-					Requests:      row.Requests,
-					TotalStudents: row.TotalStudents,
-					BooksAdded:    row.BooksAdded,
-				})
-			} else {
-				results = append(results, domain.ChartData{
-					Month:         label,
-					Date:          key,
-					Borrowed:      0,
-					Returned:      0,
-					Due:           0,
-					Requests:      0,
-					TotalStudents: 0,
-					BooksAdded:    0,
-				})
-			}
+			key := formatGroupKey(d, req.Range)
+			row := dataMap[key]
+
+			result = append(result, domain.ChartData{
+				Month:         d.Format("Mon 02"),
+				Date:          d.Format("2006-01-02"),
+				Borrowed:      row.Borrowed,
+				Returned:      row.Returned,
+				Due:           row.Due,
+				Requests:      row.Requests,
+				TotalStudents: row.TotalStudents,
+				BooksAdded:    row.BooksAdded,
+			})
 		}
-	} else {
-		// For non-daily, just return what DB gave
-		for _, row := range rawData {
-			results = append(results, domain.ChartData{
-				Month:         row.Label,
-				Date:          row.GroupKey,
+	case "weekly":
+		for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 7) {
+			key := formatGroupKey(d, req.Range)
+			row := dataMap[key]
+
+			year, week := d.ISOWeek()
+			result = append(result, domain.ChartData{
+				Month:         fmt.Sprintf("Wk %02d", week),
+				Date:          fmt.Sprintf("%04d-W%02d", year, week),
+				Borrowed:      row.Borrowed,
+				Returned:      row.Returned,
+				Due:           row.Due,
+				Requests:      row.Requests,
+				TotalStudents: row.TotalStudents,
+				BooksAdded:    row.BooksAdded,
+			})
+		}
+	case "monthly":
+		for d := startDate; !d.After(endDate); d = d.AddDate(0, 1, 0) {
+			key := formatGroupKey(d, req.Range)
+			row := dataMap[key]
+
+			result = append(result, domain.ChartData{
+				Month:         d.Format("Jan 2006"),
+				Date:          d.Format("2006-01"),
+				Borrowed:      row.Borrowed,
+				Returned:      row.Returned,
+				Due:           row.Due,
+				Requests:      row.Requests,
+				TotalStudents: row.TotalStudents,
+				BooksAdded:    row.BooksAdded,
+			})
+		}
+	case "yearly":
+		for d := startDate; !d.After(endDate); d = d.AddDate(1, 0, 0) {
+			key := formatGroupKey(d, req.Range)
+			row := dataMap[key]
+
+			result = append(result, domain.ChartData{
+				Month:         d.Format("2006"),
+				Date:          d.Format("2006"),
 				Borrowed:      row.Borrowed,
 				Returned:      row.Returned,
 				Due:           row.Due,
@@ -278,7 +327,24 @@ func (r *Repository) GetDailyChartData(startDateStr, endDateStr, rangeType strin
 		}
 	}
 
-	return results, nil
+	return result, nil
+}
+
+// Helper to make Go keys match Postgres TO_CHAR
+func formatGroupKey(d time.Time, rng string) string {
+	switch rng {
+	case "daily":
+		return d.Format("2006-01-02")
+	case "weekly":
+		year, week := d.ISOWeek()
+		return fmt.Sprintf("%04d-%02d", year, week)
+	case "monthly":
+		return d.Format("2006-01")
+	case "yearly":
+		return d.Format("2006")
+	default:
+		return d.Format("2006-01-02")
+	}
 }
 
 func (r *Repository) GetBorrowedBookStats() (*domain.BorrowedBookStats, error) {

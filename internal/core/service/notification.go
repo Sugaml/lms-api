@@ -75,6 +75,25 @@ func (s *Service) UpdateNotification(id string, req *domain.UpdateNotificationRe
 	return data, nil
 }
 
+func (s *Service) ReadAllNotification() (*domain.NotificationResponse, error) {
+	mp := map[string]interface{}{"is_read": true}
+	result, err := s.repo.ReadAllNotification(mp)
+	if err != nil {
+		return nil, err
+	}
+	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    "Read all Notifications.",
+		Action:   "read_all",
+		Data:     fmt.Sprint(result),
+		IsActive: true,
+	})
+	if result == nil {
+		return nil, errors.New("no unread notifications found")
+	}
+	data := domain.Convert[domain.Notification, domain.NotificationResponse](result)
+	return data, nil
+}
+
 func (s *Service) DeleteNotification(id string) (*domain.NotificationResponse, error) {
 	result, err := s.repo.GetNotification(id)
 	if err != nil {

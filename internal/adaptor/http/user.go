@@ -133,6 +133,30 @@ func (h *Handler) GetUser(ctx *gin.Context) {
 	SuccessResponse(ctx, result)
 }
 
+// GetProfile 			godoc
+// @Summary 		Get Profile
+// @Description 	Get Profile from Id
+// @Tags 			Profile
+// @Accept  		json
+// @Produce  		json
+// @Security 		ApiKeyAuth
+// @Param 			id path string true "Profile id"
+// @Success 		200 {object} domain.ProfileResponse
+// @Router 			/profiles/{id} [get]
+func (h *Handler) GetProfile(ctx *gin.Context) {
+	id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	result, err := h.svc.GetUser(id.(string))
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	SuccessResponse(ctx, result)
+}
+
 // UpdateUser		godoc
 // @Summary 			Update User
 // @Description 		Update User from Id

@@ -62,6 +62,11 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 
 	v1.Use(authMiddleware(handler.tokenMaker))
 
+	profile := v1.Group("/profiles")
+	{
+		profile.GET("/me", handler.GetProfile)
+	}
+
 	userAuth := v1.Group("/users")
 	{
 		userAuth.GET("", handler.ListUser)
@@ -143,6 +148,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	notification := v1.Group("/notifications")
 	{
 		notification.POST("", handler.CreateNotification)
+		notification.POST("read-all", handler.ReadAllNotification)
 		notification.GET("", handler.ListNotification)
 		notification.GET("/:id", handler.GetNotification)
 		notification.PUT("/:id", handler.UpdateNotification)

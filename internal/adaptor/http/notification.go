@@ -103,6 +103,26 @@ func (h *Handler) UpdateNotification(ctx *gin.Context) {
 	SuccessResponse(ctx, data)
 }
 
+// UpdateNotification	godoc
+// @Summary 			Update Notification
+// @Description 		Update Notification from Id
+// @Tags 				Notifications
+// @Accept  			json
+// @Produce  			json
+// @Security 			ApiKeyAuth
+// @Param 				id 							path 		string 								true 	"Notifications id"
+// @Param 				NotificationsUpdateRequest	 body 		domain.UpdateNotificationRequest 	true 	"Update Notifications Response request"
+// @Success 			200 						{object} 	domain.NotificationResponse
+// @Router 				/Notificationss/read-all 		[put]
+func (h *Handler) ReadAllNotification(ctx *gin.Context) {
+	data, err := h.svc.ReadAllNotification()
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	SuccessResponse(ctx, data)
+}
+
 // DeleteNotification 	godoc
 // @Summary 			Delete Notification
 // @Description 		Delete Notification from Id
