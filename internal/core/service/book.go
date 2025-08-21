@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,7 +10,7 @@ import (
 )
 
 // CreateBook creates a new Book
-func (s *Service) CreateBook(req *domain.BookRequest) (*domain.BookResponse, error) {
+func (s *Service) CreateBook(ctx context.Context, req *domain.BookRequest) (*domain.BookResponse, error) {
 	err := req.Validate()
 	if err != nil {
 		return nil, err
@@ -19,9 +20,14 @@ func (s *Service) CreateBook(req *domain.BookRequest) (*domain.BookResponse, err
 	if err != nil {
 		return nil, err
 	}
+	userID, err := getUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	_, _ = s.repo.CreateNotification(&domain.Notification{
 		Title:       fmt.Sprintf("Created new %s Book.", result.Title),
 		Description: "create",
+		UserID:      userID,
 		Type:        "book",
 		Action:      "create",
 		Module:      "book",
@@ -37,7 +43,7 @@ func (s *Service) CreateBook(req *domain.BookRequest) (*domain.BookResponse, err
 }
 
 // ListBooks retrieves a list of Books
-func (s *Service) ListBook(req *domain.BookListRequest) ([]*domain.BookResponse, int64, error) {
+func (s *Service) ListBook(ctx context.Context, req *domain.BookListRequest) ([]*domain.BookResponse, int64, error) {
 	var datas = []*domain.BookResponse{}
 	results, count, err := s.repo.ListBook(req)
 	if err != nil {
@@ -51,7 +57,7 @@ func (s *Service) ListBook(req *domain.BookListRequest) ([]*domain.BookResponse,
 	return datas, count, nil
 }
 
-func (s *Service) GetBook(id string) (*domain.BookResponse, error) {
+func (s *Service) GetBook(ctx context.Context, id string) (*domain.BookResponse, error) {
 	result, err := s.repo.GetBook(id)
 	if err != nil {
 		return nil, err
@@ -60,7 +66,7 @@ func (s *Service) GetBook(id string) (*domain.BookResponse, error) {
 	return data, nil
 }
 
-func (s *Service) UpdateBook(id string, req *domain.BookUpdateRequest) (*domain.BookResponse, error) {
+func (s *Service) UpdateBook(ctx context.Context, id string, req *domain.BookUpdateRequest) (*domain.BookResponse, error) {
 	if id == "" {
 		return nil, errors.New("required Book id")
 	}
@@ -93,7 +99,7 @@ func (s *Service) UpdateBook(id string, req *domain.BookUpdateRequest) (*domain.
 	return data, nil
 }
 
-func (s *Service) DeleteBook(id string) (*domain.BookResponse, error) {
+func (s *Service) DeleteBook(ctx context.Context, id string) (*domain.BookResponse, error) {
 	result, err := s.repo.GetBook(id)
 	if err != nil {
 		return nil, err

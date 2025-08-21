@@ -29,6 +29,13 @@ func (s *Service) CreateUser(req *domain.UserRequest) (*domain.UserResponse, err
 	if err != nil {
 		return nil, err
 	}
+	s.repo.CreateNotification(&domain.Notification{
+		Title:    fmt.Sprintf("New User %s created.", result.Username),
+		UserID:   result.ID,
+		Module:   "user",
+		Action:   "create",
+		IsActive: true,
+	})
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("Created new User %s.", result.Username),
 		UserID:   &result.ID,
@@ -55,6 +62,13 @@ func (s *Service) LoginUser(req *domain.LoginRequest) (*domain.LoginUserResponse
 	if err != nil {
 		return nil, err
 	}
+	s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    fmt.Sprintf("User %s logged in.", user.Username),
+		UserID:   &user.ID,
+		Action:   "login",
+		Data:     fmt.Sprintf("User %s logged in successfully", user.Username),
+		IsActive: true,
+	})
 	return &domain.LoginUserResponse{
 		AccessToken: accessToken,
 		User:        domain.Convert[domain.User, domain.UserResponse](user),

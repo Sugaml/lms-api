@@ -191,7 +191,7 @@ func (r *Repository) GetDailyChartData(req *domain.ChartRequest) ([]domain.Chart
 	borrowGroupExpr := "TO_CHAR(borrowed_date, 'YYYY-MM-DD')" // daily
 	studentGroupExpr := "TO_CHAR(created_at, 'YYYY-MM-DD')"   // daily
 	bookGroupExpr := "TO_CHAR(created_at, 'YYYY-MM-DD')"      // daily
-	
+
 	switch req.Range {
 	case "weekly":
 		borrowGroupExpr = "TO_CHAR(borrowed_date, 'IYYY-IW')" // ISO week

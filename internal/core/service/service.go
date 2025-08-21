@@ -1,6 +1,9 @@
 package service
 
 import (
+	"context"
+	"errors"
+
 	"github.com/sugaml/lms-api/internal/core/auth"
 	"github.com/sugaml/lms-api/internal/core/port"
 )
@@ -36,3 +39,11 @@ type mapString map[string]string
 // 	}
 // 	return urls
 // }
+
+func getUserID(ctx context.Context) (string, error) {
+	userID, exists := ctx.Value("authorization_user_id").(string)
+	if !exists {
+		return "", errors.New("user ID not found in context")
+	}
+	return userID, nil
+}

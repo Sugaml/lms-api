@@ -31,7 +31,7 @@ func (h *Handler) CreateBook(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
-	result, err := h.svc.CreateBook(req)
+	result, err := h.svc.CreateBook(ctx, req)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -62,7 +62,7 @@ func (h *Handler) ListBook(ctx *gin.Context) {
 		return
 	}
 	logrus.Info("Authorization user id: ", user_id)
-	result, count, err := h.svc.ListBook(&req)
+	result, count, err := h.svc.ListBook(ctx, &req)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -82,7 +82,7 @@ func (h *Handler) ListBook(ctx *gin.Context) {
 // @Router 			/books/{id} [get]
 func (h *Handler) GetBook(ctx *gin.Context) {
 	id := ctx.Param("id")
-	result, err := h.svc.GetBook(id)
+	result, err := h.svc.GetBook(ctx, id)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -108,7 +108,7 @@ func (h *Handler) UpdateBook(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
-	data, err := h.svc.UpdateBook(id, req)
+	data, err := h.svc.UpdateBook(ctx, id, req)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -133,7 +133,7 @@ func (ch *Handler) DeleteBook(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, errors.New("required Book id"))
 		return
 	}
-	result, err := ch.svc.DeleteBook(id)
+	result, err := ch.svc.DeleteBook(ctx, id)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return

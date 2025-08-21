@@ -16,6 +16,17 @@ func (s *Service) CreateProgram(ctx context.Context, req *domain.ProgramRequest)
 	if err != nil {
 		return nil, err
 	}
+	userID, err := getUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	s.repo.CreateNotification(&domain.Notification{
+		Title:    "New program created: " + result.Name,
+		UserID:   userID,
+		Module:   "program",
+		Action:   "create",
+		IsActive: true,
+	})
 	response := domain.Convert[domain.Program, domain.ProgramResponse](result)
 	return response, err
 }
