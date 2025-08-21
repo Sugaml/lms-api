@@ -118,9 +118,6 @@ func (u *UserRequest) Validate() error {
 	if u.FullName == "" {
 		return errors.New("full name is required")
 	}
-	if u.Image == "" {
-		return errors.New("image is required")
-	}
 	if u.Role == "Student" {
 		if u.Program == "" {
 			return errors.New("program is required")
