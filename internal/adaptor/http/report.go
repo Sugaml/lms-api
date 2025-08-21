@@ -26,12 +26,15 @@ func (h *Handler) GetLibraryDashboardStats(ctx *gin.Context) {
 }
 
 // GetMonthlyChartData	godoc
-// @Summary 		MonthlyChartData
-// @Description 	MonthlyChartData
+// @Summary 		Chart Data
+// @Description 	Get chart data for various time ranges (daily, weekly, monthly, quarterly, yearly)
 // @Tags 			Report
 // @Accept  		json
 // @Produce  		json
 // @Security 		ApiKeyAuth
+// @Param 			range 			query 		string 		false 	"Time range: daily, weekly, monthly, quarterly, yearly"
+// @Param 			start_date 		query 		string 		false 	"Start date (YYYY-MM-DD)"
+// @Param 			end_date 		query 		string 		false 	"End date (YYYY-MM-DD)"
 // @Success 		200 {array} 			domain.ChartData
 // @Router 			/reports/chart-stats	[get]
 func (h *Handler) GetMonthlyChartData(ctx *gin.Context) {

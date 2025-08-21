@@ -10,7 +10,7 @@ type BorrowedBook struct {
 	UserID       string     `gorm:"not null" json:"user_id"`
 	BookID       string     `gorm:"not null" json:"book_id"`
 	LibrarianID  string     `json:"librarian_id"`
-	BorrowedDate time.Time  `gorm:"column:borrowed_date;autoCreateTime" json:"borrowed_date"`
+	BorrowedDate time.Time  `gorm:"column:borrowed_date" json:"borrowed_date"`
 	DueDate      time.Time  `gorm:"not null" json:"due_date"`
 	ReturnedDate *time.Time `gorm:"column:returned_date" json:"returned_date"`
 	RenewalCount int        `gorm:"default:0" json:"renewal_count"`

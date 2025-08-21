@@ -148,6 +148,8 @@ func (r *Repository) GetDailyChartData(req *domain.ChartRequest) ([]domain.Chart
 		if err != nil {
 			return nil, fmt.Errorf("invalid end date: %w", err)
 		}
+		// Set end date to end of day for inclusive range
+		endDate = endDate.Add(24*time.Hour - time.Second)
 	}
 
 	// Set defaults if not provided
@@ -167,6 +169,11 @@ func (r *Repository) GetDailyChartData(req *domain.ChartRequest) ([]domain.Chart
 			endDate = time.Now()
 			startDate = endDate.AddDate(0, -12, 0) // last 12 months
 		}
+	case "quarterly":
+		if req.StartDate == "" || req.EndDate == "" {
+			endDate = time.Now()
+			startDate = endDate.AddDate(0, -12, 0) // last 12 months (4 quarters)
+		}
 	case "yearly":
 		if req.StartDate == "" || req.EndDate == "" {
 			endDate = time.Now()
@@ -180,15 +187,28 @@ func (r *Repository) GetDailyChartData(req *domain.ChartRequest) ([]domain.Chart
 	startDateStr := startDate.Format("2006-01-02")
 	endDateStr := endDate.Format("2006-01-02")
 
-	// Pick grouping based on range
-	groupExpr := "TO_CHAR(borrowed_date, 'YYYY-MM-DD')" // daily
+	// Pick grouping based on range for each table
+	borrowGroupExpr := "TO_CHAR(borrowed_date, 'YYYY-MM-DD')" // daily
+	studentGroupExpr := "TO_CHAR(created_at, 'YYYY-MM-DD')"   // daily
+	bookGroupExpr := "TO_CHAR(created_at, 'YYYY-MM-DD')"      // daily
+	
 	switch req.Range {
 	case "weekly":
-		groupExpr = "TO_CHAR(borrowed_date, 'IYYY-IW')" // ISO week
+		borrowGroupExpr = "TO_CHAR(borrowed_date, 'IYYY-IW')" // ISO week
+		studentGroupExpr = "TO_CHAR(created_at, 'IYYY-IW')"   // ISO week
+		bookGroupExpr = "TO_CHAR(created_at, 'IYYY-IW')"      // ISO week
 	case "monthly":
-		groupExpr = "TO_CHAR(borrowed_date, 'YYYY-MM')"
+		borrowGroupExpr = "TO_CHAR(borrowed_date, 'YYYY-MM')"
+		studentGroupExpr = "TO_CHAR(created_at, 'YYYY-MM')"
+		bookGroupExpr = "TO_CHAR(created_at, 'YYYY-MM')"
+	case "quarterly":
+		borrowGroupExpr = "CONCAT(EXTRACT(YEAR FROM borrowed_date), '-Q', EXTRACT(QUARTER FROM borrowed_date))"
+		studentGroupExpr = "CONCAT(EXTRACT(YEAR FROM created_at), '-Q', EXTRACT(QUARTER FROM created_at))"
+		bookGroupExpr = "CONCAT(EXTRACT(YEAR FROM created_at), '-Q', EXTRACT(QUARTER FROM created_at))"
 	case "yearly":
-		groupExpr = "TO_CHAR(borrowed_date, 'YYYY')"
+		borrowGroupExpr = "TO_CHAR(borrowed_date, 'YYYY')"
+		studentGroupExpr = "TO_CHAR(created_at, 'YYYY')"
+		bookGroupExpr = "TO_CHAR(created_at, 'YYYY')"
 	}
 
 	// SQL query: join three summaries (borrow, student, books)
@@ -197,8 +217,8 @@ func (r *Repository) GetDailyChartData(req *domain.ChartRequest) ([]domain.Chart
 			SELECT %s AS grp,
 			       COUNT(CASE WHEN status = 'borrowed' THEN 1 END) AS borrowed,
 			       COUNT(CASE WHEN status = 'returned' THEN 1 END) AS returned,
-			       COUNT(CASE WHEN status = 'due' THEN 1 END) AS due,
-			       COUNT(CASE WHEN status = 'requested' THEN 1 END) AS requests
+			       COUNT(CASE WHEN status = 'overdue' THEN 1 END) AS due,
+			       COUNT(CASE WHEN status = 'pending' THEN 1 END) AS requests
 			FROM borrowed_books
 			WHERE borrowed_date BETWEEN ? AND ?
 			GROUP BY grp
@@ -227,7 +247,7 @@ func (r *Repository) GetDailyChartData(req *domain.ChartRequest) ([]domain.Chart
 		FROM borrow_summary b
 		FULL OUTER JOIN student_summary s ON b.grp = s.grp
 		FULL OUTER JOIN book_summary bk ON COALESCE(b.grp, s.grp) = bk.grp
-	`, groupExpr, groupExpr, groupExpr)
+	`, borrowGroupExpr, studentGroupExpr, bookGroupExpr)
 
 	type Temp struct {
 		Grp           string
@@ -309,6 +329,23 @@ func (r *Repository) GetDailyChartData(req *domain.ChartRequest) ([]domain.Chart
 				BooksAdded:    row.BooksAdded,
 			})
 		}
+	case "quarterly":
+		for d := startDate; !d.After(endDate); d = d.AddDate(0, 3, 0) {
+			key := formatGroupKey(d, req.Range)
+			row := dataMap[key]
+
+			quarter := ((d.Month() - 1) / 3) + 1
+			result = append(result, domain.ChartData{
+				Month:         fmt.Sprintf("Q%d %d", quarter, d.Year()),
+				Date:          fmt.Sprintf("%d-Q%d", d.Year(), quarter),
+				Borrowed:      row.Borrowed,
+				Returned:      row.Returned,
+				Due:           row.Due,
+				Requests:      row.Requests,
+				TotalStudents: row.TotalStudents,
+				BooksAdded:    row.BooksAdded,
+			})
+		}
 	case "yearly":
 		for d := startDate; !d.After(endDate); d = d.AddDate(1, 0, 0) {
 			key := formatGroupKey(d, req.Range)
@@ -340,6 +377,9 @@ func formatGroupKey(d time.Time, rng string) string {
 		return fmt.Sprintf("%04d-%02d", year, week)
 	case "monthly":
 		return d.Format("2006-01")
+	case "quarterly":
+		quarter := ((d.Month() - 1) / 3) + 1
+		return fmt.Sprintf("%d-Q%d", d.Year(), quarter)
 	case "yearly":
 		return d.Format("2006")
 	default:
