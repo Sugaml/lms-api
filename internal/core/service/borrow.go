@@ -14,11 +14,11 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	if err != nil {
 		return nil, err
 	}
-	isBookBorrowd := s.repo.IsBookBorrowByUserID(req.UserID, req.BookID)
+	isBookBorrowd := s.repo.IsBookBorrowByUserID(req.UserID, req.BookCopyID)
 	if isBookBorrowd {
 		return nil, errors.New("book already borrowed")
 	}
-	book, err := s.repo.GetBook(req.BookID)
+	book, err := s.repo.GetBookCopy(req.BookCopyID)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	if data.Status == "borrowed" {
 		data.Status = "issued"
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-			Title:    fmt.Sprintf("%s book has %s to %s", book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s to %s", book.Book.Title, result.Status, user.FullName),
 			UserID:   &result.ID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
@@ -48,14 +48,14 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	if data.Status == "pending" {
 		data.Status = "requested"
 		s.repo.CreateNotification(&domain.Notification{
-			Title:    fmt.Sprintf("%s book has %s by %s", book.Title, data.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s by %s", book.Book.Title, data.Status, user.FullName),
 			UserID:   user.ID,
 			Module:   "borrow",
 			Action:   "borrow",
 			IsActive: true,
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-			Title:    fmt.Sprintf("%s book has %s by %s", book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s by %s", book.Book.Title, result.Status, user.FullName),
 			UserID:   &result.ID,
 			Action:   "create",
 			Data:     fmt.Sprint(req),

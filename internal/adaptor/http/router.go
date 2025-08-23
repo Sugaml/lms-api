@@ -111,6 +111,15 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 		book.DELETE("/:id", handler.DeleteBook)
 	}
 
+	bookCopies := v1.Group("/book-copies")
+	{
+		bookCopies.POST("", handler.CreateBookCopy)
+		bookCopies.GET("", handler.ListBookCopy)
+		bookCopies.GET("/:id", handler.GetBookCopy)
+		bookCopies.PUT("/:id", handler.UpdateBookCopy)
+		bookCopies.DELETE("/:id", handler.DeleteBookCopy)
+	}
+
 	student := v1.Group("/students")
 	{
 		student.POST("", handler.CreateStudent)

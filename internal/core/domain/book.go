@@ -7,17 +7,18 @@ import (
 
 type Book struct {
 	BaseModel
-	Title       string `gorm:"type:varchar(255);not null" json:"title"`
-	Author      string `gorm:"type:varchar(255);not null" json:"author"`
-	ISBN        string `gorm:"type:varchar(20);unique;not null" json:"isbn"`
-	CategoryID  string `gorm:"not null" json:"category_id"`
-	Program     string `gorm:"type:varchar(100);not null" json:"program"`
-	Description string `gorm:"type:text" json:"description"`
-	CoverImage  string `gorm:"type:text" json:"cover_image,omitempty"`
-	TotalPages  uint   `json:"total_pages"`
-	TotalCopies uint   `gorm:"not null;default:1" json:"total_copies"`
-	IsActive    bool   `gorm:"default:true" json:"is_active"`
-
+	Title       string    `gorm:"type:varchar(255);not null" json:"title"`
+	Author      string    `gorm:"type:varchar(255);not null" json:"author"`
+	ISBN        string    `gorm:"type:varchar(20);unique;not null" json:"isbn"`
+	CategoryID  string    `gorm:"not null" json:"category_id"`
+	Program     string    `gorm:"type:varchar(100);not null" json:"program"`
+	Description string    `gorm:"type:text" json:"description"`
+	CoverImage  string    `gorm:"type:text" json:"cover_image,omitempty"`
+	TotalPages  uint      `json:"total_pages"`
+	TotalCopies uint      `gorm:"not null;default:1" json:"total_copies"`
+	IsActive    bool      `gorm:"default:true" json:"is_active"`
+	Category    *Category `gorm:"foreignkey:ID;references:CategoryID" json:"category,omitempty"`
+	Programs    *Program  `gorm:"foreignkey:Name;references:Program" json:"programs,omitempty"`
 	// Relations
 	Copies []BookCopy `gorm:"foreignKey:BookID" json:"copies,omitempty"`
 }
@@ -47,12 +48,12 @@ type BookCopyUpdateRequest struct {
 type BookCopyResponse struct {
 	ID              string        `json:"id"`
 	CreatedAt       time.Time     `json:"created_at"`
-	BookID          string        `gorm:"not null" json:"book_id"` // FK to Book
-	AccessionNumber string        `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
-	Status          string        `gorm:"type:varchar(20);not null;default:'available'" json:"status"`
-	Book            *BookResponse `gorm:"foreignkey:ID;references:BookID" json:"book,omitempty"`
+	BookID          string        `json:"book_id"` // FK to Book
+	AccessionNumber string        `json:"accession_number"`
+	Status          string        `json:"status"`
+	Book            *BookResponse `json:"book,omitempty"`
 	// Relations
-	BorrowedBooks []BorrowedBookResponse `gorm:"foreignKey:BookCopyID" json:"borrowed_books,omitempty"`
+	BorrowedBooks []BorrowedBookResponse `json:"borrowed_books,omitempty"`
 }
 
 type BookCopyListRequest struct {
@@ -114,18 +115,19 @@ type BookAllUpdateRequest struct {
 }
 
 type BookResponse struct {
-	ID              string    `json:"id"`
-	CreatedAt       time.Time `json:"created_at"`
-	Title           string    `json:"title"`
-	Author          string    `json:"author"`
-	ISBN            string    `json:"isbn"`
-	Category        string    `json:"category"`
-	Program         string    `json:"program"`
-	AssertionID     string    `json:"assertion_id"`
-	TotalCopies     uint      `json:"total_copies"`
-	AvailableCopies uint      `json:"available_copies"`
-	Description     string    `json:"description"`
-	CoverImage      string    `json:"cover_image"`
+	ID              string            `json:"id"`
+	CreatedAt       time.Time         `json:"created_at"`
+	Title           string            `json:"title"`
+	Author          string            `json:"author"`
+	ISBN            string            `json:"isbn"`
+	Program         string            `json:"program"`
+	AssertionID     string            `json:"assertion_id"`
+	TotalCopies     uint              `json:"total_copies"`
+	AvailableCopies uint              `json:"available_copies"`
+	Description     string            `json:"description"`
+	CoverImage      string            `json:"cover_image"`
+	Category        *CategoryResponse `json:"category,omitempty"`
+	Programs        *ProgramResponse  `json:"programs,omitempty"`
 }
 
 func (r *BookRequest) Validate() error {

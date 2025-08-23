@@ -18,6 +18,7 @@ type Service interface {
 	CategoryService
 	ProgramService
 	BookService
+	BookCopyService
 	FineService
 	BorrowService
 	ReportService

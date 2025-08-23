@@ -22,6 +22,15 @@ type BorrowedBook struct {
 	BookCopy     *BookCopy  `gorm:"foreignKey:BookCopyID" json:"book_copy,omitempty"`
 }
 
+type BorrowBookCopyResponse struct {
+	ID              string             `json:"id"`
+	CreatedAt       time.Time          `json:"created_at"`
+	BookID          string             `json:"book_id"` // FK to Book
+	AccessionNumber string             `json:"accession_number"`
+	Status          string             `json:"status"`
+	Book            BorrowBookResponse `json:"book"`
+}
+
 type BorrowBookResponse struct {
 	Title      string `json:"title"`
 	Author     string `json:"author"`
@@ -36,7 +45,7 @@ type BorrowStudentResponse struct {
 
 type BorrowedBookRequest struct {
 	UserID       string     `json:"user_id"`
-	BookID       string     `json:"book_id"`
+	BookCopyID   string     `json:"book_copy_id"`
 	DueDate      time.Time  `json:"due_date"`
 	Status       string     `json:"status"`
 	ReturnedDate *time.Time `json:"returned_date"`
@@ -68,28 +77,29 @@ type ListBorrowedBookRequest struct {
 }
 
 type BorrowedBookResponse struct {
-	ID           string                `json:"id"`
-	CreatedAt    time.Time             `json:"created_at"`
-	UserID       string                `json:"user_id"`
-	BookID       string                `json:"book_id"`
-	LibrarianID  string                `json:"librarian_id"`
-	BorrowedDate time.Time             `json:"borrowed_date"`
-	DueDate      time.Time             `json:"due_date"`
-	ReturnedDate *time.Time            `json:"returned_date"`
-	RenewalCount int                   `json:"renewal_count"`
-	Status       string                `json:"status"` // 'borrowed' | 'returned' | 'overdue'
-	Student      BorrowStudentResponse `json:"student"`
-	Librarian    UserResponse          `json:"librarian"`
-	Book         BorrowBookResponse    `json:"book"`
-	Remarks      string                `json:"remarks"`
-	IsActive     bool                  `json:"is_active"`
+	ID           string                 `json:"id"`
+	CreatedAt    time.Time              `json:"created_at"`
+	UserID       string                 `json:"user_id"`
+	BookCopyID   string                 `json:"book_copy_id"`
+	LibrarianID  string                 `json:"librarian_id"`
+	BorrowedDate time.Time              `json:"borrowed_date"`
+	DueDate      time.Time              `json:"due_date"`
+	ReturnedDate *time.Time             `json:"returned_date"`
+	RenewalCount int                    `json:"renewal_count"`
+	Status       string                 `json:"status"` // 'borrowed' | 'returned' | 'overdue'
+	Student      BorrowStudentResponse  `json:"student"`
+	Librarian    UserResponse           `json:"librarian"`
+	Book         BorrowBookResponse     `json:"book"`
+	BookCopy     BorrowBookCopyResponse `json:"book_copy"`
+	Remarks      string                 `json:"remarks"`
+	IsActive     bool                   `json:"is_active"`
 }
 
 func (r BorrowedBookRequest) Validate() error {
 	if r.UserID == "" {
 		return errors.New("user id is required")
 	}
-	if r.BookID == "" {
+	if r.BookCopyID == "" {
 		return errors.New("book id is required")
 	}
 	if r.DueDate.IsZero() {

@@ -63,7 +63,8 @@ func (r *Repository) GetBorrow(id string) (*domain.BorrowedBook, error) {
 func (r *Repository) GetBookBorrowByUserID(user_id string) ([]*domain.BorrowedBook, error) {
 	var data []*domain.BorrowedBook
 	if err := r.db.Model(&domain.BorrowedBook{}).
-		Preload("Book").
+		Preload("BookCopy").
+		Preload("BookCopy.Book").
 		Preload("Student").
 		Where("user_id = ?", user_id).Find(&data).Error; err != nil {
 		return nil, err
@@ -81,7 +82,7 @@ func (r *Repository) GetAvailableCopies(bookID string) (uint, error) {
 	// Count currently borrowed copies
 	var borrowedCount int64
 	if err := r.db.Model(&domain.BorrowedBook{}).
-		Where("book_id = ? AND status = ?", bookID, "borrowed").
+		Where("book_copy_id = ? AND status = ?", bookID, "borrowed").
 		Count(&borrowedCount).Error; err != nil {
 		return 0, err
 	}
