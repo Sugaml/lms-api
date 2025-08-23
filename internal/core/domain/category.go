@@ -14,6 +14,7 @@ type Category struct {
 	Tags     string `json:"tags"`
 	Labels   string `json:"labels"`
 	IsActive bool   `gorm:"is_active"`
+	Books    []Book `gorm:"foreignKey:CategoryID" json:"books,omitempty"`
 }
 
 type CategoryRequest struct {

@@ -8,7 +8,7 @@ import (
 type BorrowedBook struct {
 	BaseModel
 	UserID       string     `gorm:"not null" json:"user_id"`
-	BookID       string     `gorm:"not null" json:"book_id"`
+	BookCopyID   string     `gorm:"not null" json:"book_copy_id"` // FK to BookCopy
 	LibrarianID  string     `json:"librarian_id"`
 	BorrowedDate time.Time  `gorm:"column:borrowed_date" json:"borrowed_date"`
 	DueDate      time.Time  `gorm:"not null" json:"due_date"`
@@ -19,7 +19,7 @@ type BorrowedBook struct {
 	IsActive     bool       `gorm:"column:is_active;default:false" json:"is_active"`
 	Student      *User      `gorm:"foreignkey:ID;references:UserID" json:"student"`
 	Librarian    *User      `gorm:"foreignkey:ID;references:LibrarianID" json:"librarian"`
-	Book         *Book      `gorm:"foreignkey:ID;references:BookID" json:"book"`
+	BookCopy     *BookCopy  `gorm:"foreignKey:BookCopyID" json:"book_copy,omitempty"`
 }
 
 type BorrowBookResponse struct {

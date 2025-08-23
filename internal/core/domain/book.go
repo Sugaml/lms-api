@@ -7,25 +7,65 @@ import (
 
 type Book struct {
 	BaseModel
-	Title       string `gorm:"not null" json:"title"`
-	Author      string `gorm:"not null" json:"author"`
-	ISBN        string `gorm:"unique;not null" json:"isbn"`
-	Category    string `gorm:"not null" json:"category"`
+	Title       string `gorm:"type:varchar(255);not null" json:"title"`
+	Author      string `gorm:"type:varchar(255);not null" json:"author"`
+	ISBN        string `gorm:"type:varchar(20);unique;not null" json:"isbn"`
 	CategoryID  string `gorm:"not null" json:"category_id"`
-	AssertionID string `gorm:"null" json:"assertion_id"`
-	Program     string `gorm:"not null" json:"program"`
-	TotalCopies uint   `gorm:"not null" json:"total_copies"`
-	Description string `gorm:"not null" json:"description"`
-	CoverImage  string `gorm:"column:cover_image" json:"cover_image"`
-	TotalPages  uint   `gorm:"column:total_pages" json:"total_pages"`
-	IsActive    bool   `gorm:"column:is_active;default:false" json:"is_active"`
+	Program     string `gorm:"type:varchar(100);not null" json:"program"`
+	Description string `gorm:"type:text" json:"description"`
+	CoverImage  string `gorm:"type:text" json:"cover_image,omitempty"`
+	TotalPages  uint   `json:"total_pages"`
+	TotalCopies uint   `gorm:"not null;default:1" json:"total_copies"`
+	IsActive    bool   `gorm:"default:true" json:"is_active"`
+
+	// Relations
+	Copies []BookCopy `gorm:"foreignKey:BookID" json:"copies,omitempty"`
+}
+
+type BookCopy struct {
+	BaseModel
+	BookID          string `gorm:"not null" json:"book_id"` // FK to Book
+	AccessionNumber string `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
+	Status          string `gorm:"type:varchar(20);not null;default:'available'" json:"status"`
+	Book            *Book  `gorm:"foreignkey:ID;references:BookID" json:"book,omitempty"`
+	// Relations
+	BorrowedBooks []BorrowedBook `gorm:"foreignKey:BookCopyID" json:"borrowed_books,omitempty"`
+}
+
+type BookCopyRequest struct {
+	BookID          string `gorm:"not null" json:"book_id"` // FK to Book
+	AccessionNumber string `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
+	Status          string `gorm:"type:varchar(20);not null;default:'available'" json:"status"`
+}
+
+type BookCopyUpdateRequest struct {
+	BookID          string `gorm:"not null" json:"book_id"` // FK to Book
+	AccessionNumber string `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
+	Status          string `gorm:"type:varchar(20);not null;default:'available'" json:"status"`
+}
+
+type BookCopyResponse struct {
+	ID              string        `json:"id"`
+	CreatedAt       time.Time     `json:"created_at"`
+	BookID          string        `gorm:"not null" json:"book_id"` // FK to Book
+	AccessionNumber string        `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
+	Status          string        `gorm:"type:varchar(20);not null;default:'available'" json:"status"`
+	Book            *BookResponse `gorm:"foreignkey:ID;references:BookID" json:"book,omitempty"`
+	// Relations
+	BorrowedBooks []BorrowedBookResponse `gorm:"foreignKey:BookCopyID" json:"borrowed_books,omitempty"`
+}
+
+type BookCopyListRequest struct {
+	ListRequest
+	BookID string `form:"book_id"`
+	Status string `form:"status"` // available, issued, reserved
 }
 
 type BookRequest struct {
 	Title       string `json:"title"`
 	Author      string `json:"author"`
 	ISBN        string `json:"isbn"`
-	Category    string `json:"category"`
+	CategoryID  string `json:"category_id"`
 	Program     string `json:"program"`
 	AssertionID string `json:"assertion_id"`
 	TotalCopies uint   `json:"total_copies"`
@@ -123,6 +163,30 @@ func (r *BookUpdateRequest) NewUpdate() Map {
 	}
 	if r.TotalPages != nil {
 		mp["total_pages"] = *r.TotalPages
+	}
+	return mp
+}
+
+func (r *BookCopyRequest) Validate() error {
+	if r.BookID == "" {
+		return errors.New("book_id is required")
+	}
+	if r.AccessionNumber == "" {
+		return errors.New("accession_number is required")
+	}
+	return nil
+}
+
+func (r *BookCopyUpdateRequest) NewUpdate() Map {
+	mp := map[string]interface{}{}
+	if r.BookID != "" {
+		mp["book_id"] = r.BookID
+	}
+	if r.AccessionNumber != "" {
+		mp["accession_number"] = r.AccessionNumber
+	}
+	if r.Status != "" {
+		mp["status"] = r.Status
 	}
 	return mp
 }

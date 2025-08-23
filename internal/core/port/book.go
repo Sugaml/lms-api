@@ -15,6 +15,15 @@ type BookRepository interface {
 	DeleteBook(id string) error
 }
 
+type BookCopyRepository interface {
+	CreateBookCopy(copy *domain.BookCopy) (*domain.BookCopy, error)
+	ListBookCopies(req *domain.BookCopyListRequest) ([]*domain.BookCopy, int64, error)
+	GetBookCopy(id string) (*domain.BookCopy, error)
+	CountBorrowedCopyID(bookCopyID string) (int64, error)
+	UpdateBookCopy(id string, req domain.Map) (*domain.BookCopy, error)
+	DeleteBookCopy(id string) error
+}
+
 // type BookService interface is an interface for interacting with type Announcement-related data
 type BookService interface {
 	CreateBook(ctx context.Context, data *domain.BookRequest) (*domain.BookResponse, error)
@@ -22,4 +31,12 @@ type BookService interface {
 	GetBook(ctx context.Context, id string) (*domain.BookResponse, error)
 	UpdateBook(ctx context.Context, id string, req *domain.BookUpdateRequest) (*domain.BookResponse, error)
 	DeleteBook(ctx context.Context, id string) (*domain.BookResponse, error)
+}
+
+type BookCopyService interface {
+	CreateBookCopy(ctx context.Context, req *domain.BookCopyRequest) (*domain.BookCopyResponse, error)
+	ListBookCopies(ctx context.Context, req *domain.BookCopyListRequest) ([]*domain.BookCopyResponse, int64, error)
+	GetBookCopy(ctx context.Context, id string) (*domain.BookCopyResponse, error)
+	UpdateBookCopy(ctx context.Context, id string, req *domain.BookCopyUpdateRequest) (*domain.BookCopyResponse, error)
+	DeleteBookCopy(ctx context.Context, id string) (*domain.BookCopyResponse, error)
 }

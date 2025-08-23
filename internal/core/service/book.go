@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
@@ -11,21 +12,42 @@ import (
 
 // CreateBook creates a new Book
 func (s *Service) CreateBook(ctx context.Context, req *domain.BookRequest) (*domain.BookResponse, error) {
-	err := req.Validate()
+	// Validate request
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	// Convert to Book model
+	book := domain.Convert[domain.BookRequest, domain.Book](req)
+	logrus.Info("Book to be created: ", book)
+	// Create Book record
+	result, err := s.repo.CreateBook(book)
 	if err != nil {
 		return nil, err
 	}
-	data := domain.Convert[domain.BookRequest, domain.Book](req)
-	result, err := s.repo.CreateBook(data)
-	if err != nil {
-		return nil, err
+
+	// Dynamically create BookCopy entries
+	copies := make([]*domain.BookCopy, result.TotalCopies)
+	for i := uint(0); i < result.TotalCopies; i++ {
+		copies[i] = &domain.BookCopy{
+			BookID:          result.ID,
+			AccessionNumber: fmt.Sprintf("%s-%03d", strings.ReplaceAll(result.ISBN, "-", ""), i+1),
+			Status:          "available",
+		}
 	}
-	userID, err := getUserID(ctx)
-	if err != nil {
-		return nil, err
+
+	// Bulk insert copies
+	for _, copy := range copies {
+		if _, err := s.repo.CreateBookCopy(copy); err != nil {
+			// optionally log error but continue
+			logrus.Error("Failed to create book copy: ", err)
+		}
 	}
+
+	// Optional: Create notification and audit log
+	userID, _ := getUserID(ctx)
 	_, _ = s.repo.CreateNotification(&domain.Notification{
-		Title:       fmt.Sprintf("Created new %s Book.", result.Title),
+		Title:       fmt.Sprintf("Created new Book %s with %d copies.", result.Title, result.TotalCopies),
 		Description: "create",
 		UserID:      userID,
 		Type:        "book",
@@ -33,12 +55,14 @@ func (s *Service) CreateBook(ctx context.Context, req *domain.BookRequest) (*dom
 		Module:      "book",
 		IsActive:    true,
 	})
+
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-		Title:    fmt.Sprintf("Created new Book %s.", result.Title),
+		Title:    fmt.Sprintf("Created new Book %s with copies.", result.Title),
 		Action:   "create",
 		Data:     string(domain.ConvertToJson(result)),
 		IsActive: true,
 	})
+
 	return domain.Convert[domain.Book, domain.BookResponse](result), nil
 }
 

@@ -110,7 +110,7 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 		return nil, err
 	}
 
-	book, err := s.repo.GetBook(borrow.BookID)
+	book, err := s.repo.GetBookCopy(borrow.BookCopyID)
 	if err != nil {
 		return nil, err
 	}
@@ -128,14 +128,14 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 	if result.Status == "borrowed" {
 		result.Status = "issued"
 		_, _ = s.repo.CreateNotification(&domain.Notification{
-			Title:    fmt.Sprintf("%s book has %s to %s", book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s to %s", book.Book.Title, result.Status, user.FullName),
 			UserID:   user.ID,
 			Module:   "borrow",
 			Action:   "issue",
 			IsActive: true,
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-			Title:    fmt.Sprintf("%s book has %s to %s", book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s to %s", book.Book.Title, result.Status, user.FullName),
 			UserID:   &result.ID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
@@ -145,14 +145,14 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 	if result.Status == "returned" {
 		result.Status = "returned"
 		_, _ = s.repo.CreateNotification(&domain.Notification{
-			Title:    fmt.Sprintf("%s book has %s by %s", book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s by %s", book.Book.Title, result.Status, user.FullName),
 			UserID:   user.ID,
 			Module:   "borrow",
 			Action:   "return",
 			IsActive: true,
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-			Title:    fmt.Sprintf("%s book has %s by %s", book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s by %s", book.Book.Title, result.Status, user.FullName),
 			UserID:   &result.ID,
 			Action:   "update",
 			Data:     fmt.Sprint(req),
@@ -173,14 +173,14 @@ func (s *Service) DeleteBorrow(id string) (*domain.BorrowedBookResponse, error) 
 		return nil, err
 	}
 	s.repo.CreateNotification(&domain.Notification{
-		Title:    fmt.Sprintf("%s book has been deleted by %s", result.Book.Title, result.Student.FullName),
+		Title:    fmt.Sprintf("%s book has been deleted by %s", result.BookCopy.Book.Title, result.Student.FullName),
 		UserID:   result.UserID,
 		Module:   "borrow",
 		Action:   "delete",
 		IsActive: true,
 	})
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-		Title:    fmt.Sprintf("%s book has been deleted by %s", result.Book.Title, result.Student.FullName),
+		Title:    fmt.Sprintf("%s book has been deleted by %s", result.BookCopy.Book.Title, result.Student.FullName),
 		UserID:   &result.ID,
 		Action:   "delete",
 		Data:     fmt.Sprint(result),

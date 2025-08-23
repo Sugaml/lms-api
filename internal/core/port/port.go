@@ -6,6 +6,7 @@ type Repository interface {
 	CategoryRepository
 	ProgramRepository
 	BookRepository
+	BookCopyRepository
 	FineRepository
 	BorrowRepository
 	ReportRepository

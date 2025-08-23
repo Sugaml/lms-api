@@ -42,6 +42,7 @@ func NewDB(config config.Config) (*gorm.DB, error) {
 			&domain.User{},
 			&domain.AuditLog{},
 			&domain.Book{},
+			&domain.BookCopy{},
 			&domain.Fine{},
 			&domain.BorrowedBook{},
 			&domain.Category{},
@@ -53,6 +54,9 @@ func NewDB(config config.Config) (*gorm.DB, error) {
 		}
 		// db.Raw("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
 	}
+	// Seed initial data
+	SeedCategories(db)
+	SeedPrograms(db)
 	logrus.Infof("Successfully connected to the database :: %s", dbName)
 	return db, nil
 }
