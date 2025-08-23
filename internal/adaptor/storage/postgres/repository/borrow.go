@@ -41,7 +41,7 @@ func (r *Repository) ListBorrow(req *domain.ListBorrowedBookRequest) ([]*domain.
 		Limit(req.Size).
 		Offset(req.Size * (req.Page - 1)).
 		Preload("Student").
-		Preload("Book").
+		Preload("BookCopy").
 		Find(&datas).Error
 	if err != nil {
 		return nil, count, err
@@ -52,7 +52,7 @@ func (r *Repository) ListBorrow(req *domain.ListBorrowedBookRequest) ([]*domain.
 func (r *Repository) GetBorrow(id string) (*domain.BorrowedBook, error) {
 	var data domain.BorrowedBook
 	if err := r.db.Model(&domain.BorrowedBook{}).
-		Preload("Book").
+		Preload("BookCopy").
 		Preload("Student").
 		Take(&data, "id = ?", id).Error; err != nil {
 		return nil, err

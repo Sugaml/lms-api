@@ -11,14 +11,14 @@ type Book struct {
 	Author      string    `gorm:"type:varchar(255);not null" json:"author"`
 	ISBN        string    `gorm:"type:varchar(20);unique;not null" json:"isbn"`
 	CategoryID  string    `gorm:"not null" json:"category_id"`
-	Program     string    `gorm:"type:varchar(100);not null" json:"program"`
+	ProgramID   string    `gorm:"type:varchar(100);not null" json:"program_id"`
 	Description string    `gorm:"type:text" json:"description"`
 	CoverImage  string    `gorm:"type:text" json:"cover_image,omitempty"`
 	TotalPages  uint      `json:"total_pages"`
 	TotalCopies uint      `gorm:"not null;default:1" json:"total_copies"`
 	IsActive    bool      `gorm:"default:true" json:"is_active"`
 	Category    *Category `gorm:"foreignkey:ID;references:CategoryID" json:"category,omitempty"`
-	Programs    *Program  `gorm:"foreignkey:Name;references:Program" json:"programs,omitempty"`
+	Program     *Program  `gorm:"foreignkey:ID;references:ProgramID" json:"program,omitempty"`
 	// Relations
 	Copies []BookCopy `gorm:"foreignKey:BookID" json:"copies,omitempty"`
 }
@@ -67,8 +67,7 @@ type BookRequest struct {
 	Author      string `json:"author"`
 	ISBN        string `json:"isbn"`
 	CategoryID  string `json:"category_id"`
-	Program     string `json:"program"`
-	AssertionID string `json:"assertion_id"`
+	ProgramID   string `json:"program_id"`
 	TotalCopies uint   `json:"total_copies"`
 	TotalPages  uint   `json:"total_pages"`
 	Description string `json:"description"`
@@ -120,7 +119,7 @@ type BookResponse struct {
 	Title           string            `json:"title"`
 	Author          string            `json:"author"`
 	ISBN            string            `json:"isbn"`
-	Program         string            `json:"program"`
+	Program         ProgramResponse   `json:"program"`
 	AssertionID     string            `json:"assertion_id"`
 	TotalCopies     uint              `json:"total_copies"`
 	AvailableCopies uint              `json:"available_copies"`

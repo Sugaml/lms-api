@@ -36,8 +36,9 @@ type BorrowedBookStats struct {
 }
 
 type BookProgramstats struct {
-	Program string `json:"program"`
-	Count   int64  `json:"count"`
+	ProgramID   string `json:"program_id"`
+	ProgramName string `json:"program_name"`
+	Count       int    `json:"count"`
 }
 
 type InventoryStats struct {
