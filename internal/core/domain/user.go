@@ -168,9 +168,9 @@ func (u *UserRequest) Validate() error {
 	if u.Role == "" {
 		return errors.New("role is required")
 	}
-	if u.Email == "" {
-		return errors.New("email is required")
-	}
+	// if u.Email == "" {
+	// 	return errors.New("email is required")
+	// }
 	if u.FullName == "" {
 		return errors.New("full name is required")
 	}

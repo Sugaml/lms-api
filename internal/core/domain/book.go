@@ -35,6 +35,13 @@ type BookCopy struct {
 	BorrowedBooks []BorrowedBook `gorm:"foreignKey:BookCopyID" json:"borrowed_books,omitempty"`
 }
 
+type AddBookCopiesRequest struct {
+	BookID               string `json:"book_id"`
+	AddCopies            uint   `json:"add_copies"`
+	StartAccessionNumber uint   `json:"start_accession_number"`
+	EndAccessionNumber   uint   `json:"end_accession_number"`
+}
+
 type BookCopyRequest struct {
 	BookID          string `gorm:"not null" json:"book_id"` // FK to Book
 	AccessionNumber string `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
@@ -124,22 +131,23 @@ type BookAllUpdateRequest struct {
 }
 
 type BookResponse struct {
-	ID              string            `json:"id"`
-	CreatedAt       time.Time         `json:"created_at"`
-	Title           string            `json:"title"`
-	Author          string            `json:"author"`
-	ISBN            string            `json:"isbn"`
-	Publisher       string            `json:"publisher"`
-	Edition         string            `json:"edition"`
-	ProgramID       string            `json:"program_id"`
-	CategoryID      string            `json:"category_id"`
-	Program         ProgramResponse   `json:"program"`
-	TotalCopies     uint              `json:"total_copies"`
-	AvailableCopies uint              `json:"available_copies"`
-	Description     string            `json:"description"`
-	CoverImage      string            `json:"cover_image"`
-	Category        *CategoryResponse `json:"category,omitempty"`
-	Programs        *ProgramResponse  `json:"programs,omitempty"`
+	ID              string             `json:"id"`
+	CreatedAt       time.Time          `json:"created_at"`
+	Title           string             `json:"title"`
+	Author          string             `json:"author"`
+	ISBN            string             `json:"isbn"`
+	Publisher       string             `json:"publisher"`
+	Edition         string             `json:"edition"`
+	ProgramID       string             `json:"program_id"`
+	CategoryID      string             `json:"category_id"`
+	Program         ProgramResponse    `json:"program"`
+	TotalCopies     uint               `json:"total_copies"`
+	AvailableCopies uint               `json:"available_copies"`
+	Description     string             `json:"description"`
+	CoverImage      string             `json:"cover_image"`
+	Category        *CategoryResponse  `json:"category,omitempty"`
+	Programs        *ProgramResponse   `json:"programs,omitempty"`
+	Copies          []BookCopyResponse `json:"copies,omitempty"`
 }
 
 func (r *BookRequest) Validate() error {
@@ -193,13 +201,16 @@ func (r *BookUpdateRequest) NewUpdate() Map {
 	return mp
 }
 
-func (r *BookCopyRequest) Validate() error {
+func (r *AddBookCopiesRequest) Validate() error {
 	if r.BookID == "" {
 		return errors.New("book_id is required")
 	}
-	if r.AccessionNumber == "" {
-		return errors.New("accession_number is required")
-	}
+	// if r.StartAccessionNumber == 0 {
+	// 	return errors.New("start_accession_number is required")
+	// }
+	// if r.EndAccessionNumber == 0 {
+	// 	return errors.New("end_accession_number is required")
+	// }
 	return nil
 }
 

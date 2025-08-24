@@ -39,6 +39,27 @@ func (r *Repository) ListBookCopies(req *domain.BookCopyListRequest) ([]*domain.
 	return copies, count, nil
 }
 
+func (r *Repository) ListBookCopiesByBookId(bookId string, req *domain.BookCopyListRequest) ([]*domain.BookCopy, int64, error) {
+	var copies []*domain.BookCopy
+	var count int64
+	f := r.db.Model(&domain.BookCopy{})
+	if req.Query != "" {
+		req.SortColumn = "created_at desc, " + req.SortColumn
+	}
+	if req.Status != "" {
+		f = f.Where("status = ?", req.Status)
+	}
+	err := f.Where("book_id = ?", bookId).Count(&count).Preload("Book").
+		Order(req.SortColumn + " " + req.SortDirection).
+		Limit(req.Size).
+		Offset(req.Size * (req.Page - 1)).
+		Find(&copies).Error
+	if err != nil {
+		return nil, count, err
+	}
+	return copies, count, nil
+}
+
 func (r *Repository) GetBookCopy(id string) (*domain.BookCopy, error) {
 	var copy domain.BookCopy
 	if err := r.db.Model(&domain.BookCopy{}).Preload("Book").

@@ -37,6 +37,9 @@ func (r *Repository) ListBook(req *domain.BookListRequest) ([]*domain.Book, int6
 func (r *Repository) GetBook(id string) (*domain.Book, error) {
 	var data domain.Book
 	if err := r.db.Model(&domain.Book{}).
+		Preload("Copies").
+		Preload("Category").
+		Preload("Program").
 		Take(&data, "id = ?", id).Error; err != nil {
 		return nil, err
 	}

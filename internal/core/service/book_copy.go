@@ -8,41 +8,69 @@ import (
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
-func (s *Service) CreateBookCopy(ctx context.Context, req *domain.BookCopyRequest) (*domain.BookCopyResponse, error) {
+func (s *Service) CreateBookCopy(ctx context.Context, req *domain.AddBookCopiesRequest) (*domain.BookCopyResponse, error) {
 	err := req.Validate()
 	if err != nil {
 		return nil, err
 	}
-
-	data := domain.Convert[domain.BookCopyRequest, domain.BookCopy](req)
-	result, err := s.repo.CreateBookCopy(data)
+	book, err := s.repo.GetBook(req.BookID)
+	if err != nil {
+		return nil, errors.New("book not found")
+	}
+	total := book.TotalCopies + req.AddCopies
+	_, err = s.repo.UpdateBook(req.BookID, domain.Map{"total_copies": total})
 	if err != nil {
 		return nil, err
 	}
-
-	userID, _ := getUserID(ctx)
-	_, _ = s.repo.CreateNotification(&domain.Notification{
-		Title:       fmt.Sprintf("Created new copy %s of BookID %s", result.AccessionNumber, result.BookID),
-		Description: "create",
-		UserID:      userID,
-		Type:        "book_copy",
-		Action:      "create",
-		Module:      "book_copy",
-		IsActive:    true,
-	})
-	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-		Title:    fmt.Sprintf("Created new copy %s of BookID %s", result.AccessionNumber, result.BookID),
-		Action:   "create",
-		Data:     fmt.Sprint(result),
-		IsActive: true,
-	})
-
+	var result *domain.BookCopy
+	for i := req.StartAccessionNumber; i < req.StartAccessionNumber+req.AddCopies; i++ {
+		data := &domain.BookCopy{
+			BookID:          req.BookID,
+			AccessionNumber: fmt.Sprintf("%03d", i),
+			Status:          "available",
+		}
+		result, err = s.repo.CreateBookCopy(data)
+		if err != nil {
+			return nil, err
+		}
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("Created new copy %s of BookID %s", result.AccessionNumber, result.BookID),
+			Action:   "create",
+			Data:     fmt.Sprint(result),
+			IsActive: true,
+		})
+		userID, _ := getUserID(ctx)
+		_, _ = s.repo.CreateNotification(&domain.Notification{
+			Title:       fmt.Sprintf("Created new copy %s of BookID %s", result.AccessionNumber, result.BookID),
+			Description: "create",
+			UserID:      userID,
+			Type:        "book_copy",
+			Action:      "create",
+			Module:      "book_copy",
+			IsActive:    true,
+		})
+	}
 	return domain.Convert[domain.BookCopy, domain.BookCopyResponse](result), nil
 }
 
 func (s *Service) ListBookCopies(ctx context.Context, req *domain.BookCopyListRequest) ([]*domain.BookCopyResponse, int64, error) {
 	var datas []*domain.BookCopyResponse
 	results, count, err := s.repo.ListBookCopies(req)
+	if err != nil {
+		return nil, count, err
+	}
+
+	for _, r := range results {
+		data := domain.Convert[domain.BookCopy, domain.BookCopyResponse](r)
+		datas = append(datas, data)
+	}
+
+	return datas, count, nil
+}
+
+func (s *Service) ListBookCopiesByBookId(ctx context.Context, bookId string, req *domain.BookCopyListRequest) ([]*domain.BookCopyResponse, int64, error) {
+	var datas []*domain.BookCopyResponse
+	results, count, err := s.repo.ListBookCopiesByBookId(bookId, req)
 	if err != nil {
 		return nil, count, err
 	}

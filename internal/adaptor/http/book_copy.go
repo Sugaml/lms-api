@@ -26,7 +26,7 @@ func (h *Handler) CreateBookCopy(ctx *gin.Context) {
 		return
 	}
 	logrus.Info("Authorization user id: ", user_id)
-	var req *domain.BookCopyRequest
+	var req *domain.AddBookCopiesRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -62,7 +62,45 @@ func (h *Handler) ListBookCopy(ctx *gin.Context) {
 		return
 	}
 	logrus.Info("Authorization user id: ", user_id)
+	if req.Status == "" {
+		req.Status = "available"
+	}
 	result, count, err := h.svc.ListBookCopies(ctx, &req)
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	SuccessResponse(ctx, result, WithPagination(count, req.Page, req.Size))
+}
+
+// ListBookCopy 		godoc
+// @Summary 		List BookCopy
+// @Description 	List BookCopy
+// @Tags 			BookCopy
+// @Accept  		json
+// @Produce  		json
+// @Security 		ApiKeyAuth
+// @Param 			query 						query 		string 		false 	"query"
+// @Success 		200 		{array} 		domain.BookCopyResponse
+// @Router 			/books/:id/book-copies		[get]
+func (h *Handler) ListBookCopyByBookId(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var req domain.BookCopyListRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	req.Prepare()
+	user_id, exists := ctx.Get(authorizationUserrIDKey)
+	if !exists {
+		ErrorResponse(ctx, http.StatusBadRequest, errors.New("authorization user id not found"))
+		return
+	}
+	logrus.Info("Authorization user id: ", user_id)
+	if req.Status == "" {
+		req.Status = "available"
+	}
+	result, count, err := h.svc.ListBookCopiesByBookId(ctx, id, &req)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return

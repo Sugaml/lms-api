@@ -18,7 +18,7 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	if isBookBorrowd {
 		return nil, errors.New("book already borrowed")
 	}
-	book, err := s.repo.GetBookCopy(req.BookCopyID)
+	bookCopy, err := s.repo.GetBookCopy(req.BookCopyID)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +37,19 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	}
 	if data.Status == "borrowed" {
 		data.Status = "issued"
+		_, err = s.repo.UpdateBookCopy(bookCopy.ID, domain.Map{"status": "borrowed"})
+		if err != nil {
+			return nil, err
+		}
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-			Title:    fmt.Sprintf("%s book has %s to %s", book.Book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("Book %s Accession Number %s has been issued to %s", bookCopy.Book.Title, bookCopy.AccessionNumber, user.FullName),
+			UserID:   &result.ID,
+			Action:   "issue",
+			Data:     fmt.Sprint(req),
+			IsActive: true,
+		})
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("%s book has %s to %s", bookCopy.Book.Title, result.Status, user.FullName),
 			UserID:   &result.ID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
@@ -48,14 +59,14 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 	if data.Status == "pending" {
 		data.Status = "requested"
 		s.repo.CreateNotification(&domain.Notification{
-			Title:    fmt.Sprintf("%s book has %s by %s", book.Book.Title, data.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s by %s", bookCopy.Book.Title, data.Status, user.FullName),
 			UserID:   user.ID,
 			Module:   "borrow",
 			Action:   "borrow",
 			IsActive: true,
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-			Title:    fmt.Sprintf("%s book has %s by %s", book.Book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s by %s", bookCopy.Book.Title, result.Status, user.FullName),
 			UserID:   &result.ID,
 			Action:   "create",
 			Data:     fmt.Sprint(req),
@@ -110,7 +121,7 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 		return nil, err
 	}
 
-	book, err := s.repo.GetBookCopy(borrow.BookCopyID)
+	bookCopy, err := s.repo.GetBookCopy(borrow.BookCopyID)
 	if err != nil {
 		return nil, err
 	}
@@ -127,15 +138,26 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 	}
 	if result.Status == "borrowed" {
 		result.Status = "issued"
+		_, err = s.repo.UpdateBookCopy(bookCopy.ID, domain.Map{"status": "borrowed"})
+		if err != nil {
+			return nil, err
+		}
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("Book %s Accession Number %s has been issued to %s", bookCopy.Book.Title, bookCopy.AccessionNumber, user.FullName),
+			UserID:   &result.ID,
+			Action:   "issue",
+			Data:     fmt.Sprint(req),
+			IsActive: true,
+		})
 		_, _ = s.repo.CreateNotification(&domain.Notification{
-			Title:    fmt.Sprintf("%s book has %s to %s", book.Book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s to %s", bookCopy.Book.Title, result.Status, user.FullName),
 			UserID:   user.ID,
 			Module:   "borrow",
 			Action:   "issue",
 			IsActive: true,
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-			Title:    fmt.Sprintf("%s book has %s to %s", book.Book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s to %s", bookCopy.Book.Title, result.Status, user.FullName),
 			UserID:   &result.ID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
@@ -144,15 +166,26 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 	}
 	if result.Status == "returned" {
 		result.Status = "returned"
+		_, err = s.repo.UpdateBookCopy(bookCopy.ID, domain.Map{"status": "available"})
+		if err != nil {
+			return nil, err
+		}
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("Book %s Accession Number %s has been available", bookCopy.Book.Title, bookCopy.AccessionNumber),
+			UserID:   &result.ID,
+			Action:   "issue",
+			Data:     fmt.Sprint(req),
+			IsActive: true,
+		})
 		_, _ = s.repo.CreateNotification(&domain.Notification{
-			Title:    fmt.Sprintf("%s book has %s by %s", book.Book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s by %s", bookCopy.Book.Title, result.Status, user.FullName),
 			UserID:   user.ID,
 			Module:   "borrow",
 			Action:   "return",
 			IsActive: true,
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
-			Title:    fmt.Sprintf("%s book has %s by %s", book.Book.Title, result.Status, user.FullName),
+			Title:    fmt.Sprintf("%s book has %s by %s", bookCopy.Book.Title, result.Status, user.FullName),
 			UserID:   &result.ID,
 			Action:   "update",
 			Data:     fmt.Sprint(req),
