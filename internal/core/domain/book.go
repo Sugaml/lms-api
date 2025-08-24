@@ -10,6 +10,8 @@ type Book struct {
 	Title       string    `gorm:"type:varchar(255);not null" json:"title"`
 	Author      string    `gorm:"type:varchar(255);not null" json:"author"`
 	ISBN        string    `gorm:"type:varchar(20);unique;not null" json:"isbn"`
+	Publisher   string    `gorm:"type:varchar(255);null" json:"publisher"`
+	Edition     string    `gorm:"type:varchar(100)" json:"edition,omitempty"`
 	CategoryID  string    `gorm:"not null" json:"category_id"`
 	ProgramID   string    `gorm:"type:varchar(100);not null" json:"program_id"`
 	Description string    `gorm:"type:text" json:"description"`
@@ -66,6 +68,8 @@ type BookRequest struct {
 	Title       string `json:"title"`
 	Author      string `json:"author"`
 	ISBN        string `json:"isbn"`
+	Publisher   string `json:"publisher"`
+	Edition     string `json:"edition,omitempty"`
 	CategoryID  string `json:"category_id"`
 	ProgramID   string `json:"program_id"`
 	TotalCopies uint   `json:"total_copies"`
@@ -79,8 +83,9 @@ type BookListRequest struct {
 	Title       string `form:"title"`
 	Author      string `form:"author"`
 	ISBN        string `form:"isbn"`
+	Publisher   string `form:"publisher"`
+	Edition     string `form:"edition,omitempty"`
 	Category    string `form:"category"`
-	AssertionID string `json:"assertion_id"`
 	Program     string `form:"program"`
 	TotalCopies uint   `form:"total_copies"`
 	Description string `form:"description"`
@@ -91,9 +96,10 @@ type BookUpdateRequest struct {
 	Title       *string `json:"title"`
 	Author      *string `json:"author"`
 	ISBN        *string `json:"isbn"`
+	Publisher   *string `json:"publisher"`
+	Edition     *string `json:"edition,omitempty"`
 	Category    *string `json:"category"`
 	Program     *string `json:"program"`
-	AssertionID string  `json:"assertion_id"`
 	TotalCopies *uint   `json:"total_copies"`
 	TotalPages  *uint   `json:"total_pages"`
 	Description *string `json:"description"`
@@ -104,9 +110,10 @@ type BookAllUpdateRequest struct {
 	Title           string `json:"title"`
 	Author          string `json:"author"`
 	ISBN            string `json:"isbn"`
+	Publisher       string `json:"publisher"`
+	Edition         string `json:"edition"`
 	Category        string `json:"category"`
 	Program         string `json:"program"`
-	AssertionID     string `json:"assertion_id"`
 	TotalCopies     int    `json:"total_copies"`
 	AvailableCopies int    `json:"available_copies"`
 	Description     string `json:"description"`
@@ -119,8 +126,11 @@ type BookResponse struct {
 	Title           string            `json:"title"`
 	Author          string            `json:"author"`
 	ISBN            string            `json:"isbn"`
+	Publisher       string            `json:"publisher"`
+	Edition         string            `json:"edition"`
+	ProgramID       string            `json:"program_id"`
+	CategoryID      string            `json:"category_id"`
 	Program         ProgramResponse   `json:"program"`
-	AssertionID     string            `json:"assertion_id"`
 	TotalCopies     uint              `json:"total_copies"`
 	AvailableCopies uint              `json:"available_copies"`
 	Description     string            `json:"description"`
@@ -152,6 +162,18 @@ func (r *BookUpdateRequest) NewUpdate() Map {
 	}
 	if r.ISBN != nil {
 		mp["isbn"] = *r.ISBN
+	}
+	if r.Publisher != nil {
+		mp["publisher"] = *r.Publisher
+	}
+	if r.Edition != nil {
+		mp["edition"] = *r.Edition
+	}
+	if r.Description != nil {
+		mp["description"] = *r.Description
+	}
+	if r.CoverImage != nil {
+		mp["cover_image"] = *r.CoverImage
 	}
 	if r.Category != nil {
 		mp["category"] = *r.Category

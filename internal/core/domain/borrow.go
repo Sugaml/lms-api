@@ -89,7 +89,6 @@ type BorrowedBookResponse struct {
 	Status       string                 `json:"status"` // 'borrowed' | 'returned' | 'overdue'
 	Student      BorrowStudentResponse  `json:"student"`
 	Librarian    UserResponse           `json:"librarian"`
-	Book         BorrowBookResponse     `json:"book"`
 	BookCopy     BorrowBookCopyResponse `json:"book_copy"`
 	Remarks      string                 `json:"remarks"`
 	IsActive     bool                   `json:"is_active"`

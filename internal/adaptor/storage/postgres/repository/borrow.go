@@ -42,6 +42,7 @@ func (r *Repository) ListBorrow(req *domain.ListBorrowedBookRequest) ([]*domain.
 		Offset(req.Size * (req.Page - 1)).
 		Preload("Student").
 		Preload("BookCopy").
+		Preload("BookCopy.Book").
 		Find(&datas).Error
 	if err != nil {
 		return nil, count, err

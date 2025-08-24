@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
 	util "github.com/sugaml/lms-api/internal/core/utils"
 )
@@ -62,6 +63,7 @@ func (s *Service) LoginUser(req *domain.LoginRequest) (*domain.LoginUserResponse
 	if err != nil {
 		return nil, err
 	}
+	logrus.Infof("User %s logged in successfully", user.Role)
 	s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("User %s logged in.", user.Username),
 		UserID:   &user.ID,
