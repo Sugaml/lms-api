@@ -27,20 +27,33 @@ func (s *Service) CreateBook(ctx context.Context, req *domain.BookRequest) (*dom
 	}
 
 	// Dynamically create BookCopy entries
-	copies := make([]*domain.BookCopy, result.TotalCopies)
-	for i := uint(0); i < result.TotalCopies; i++ {
-		copies[i] = &domain.BookCopy{
-			BookID:          result.ID,
-			AccessionNumber: fmt.Sprintf("%s-%03d", strings.ReplaceAll(result.ISBN, "-", ""), i+1),
-			Status:          "available",
+	if req.AccessionType == "range" {
+		for i := req.StartValue; i <= req.EndValue; i++ {
+			copy := &domain.BookCopy{
+				BookID:          result.ID,
+				AccessionNumber: fmt.Sprintf("%03d", i),
+				Status:          "available",
+			}
+			if _, err := s.repo.CreateBookCopy(copy); err != nil {
+				// optionally log error but continue
+				logrus.Error("Failed to create book copy: ", err)
+			}
 		}
-	}
-
-	// Bulk insert copies
-	for _, copy := range copies {
-		if _, err := s.repo.CreateBookCopy(copy); err != nil {
-			// optionally log error but continue
-			logrus.Error("Failed to create book copy: ", err)
+	} else {
+		copies := make([]*domain.BookCopy, result.TotalCopies)
+		for i := uint(0); i < result.TotalCopies; i++ {
+			copies[i] = &domain.BookCopy{
+				BookID:          result.ID,
+				AccessionNumber: fmt.Sprintf("%s-%03d", strings.ReplaceAll(result.ISBN, "-", ""), i+1),
+				Status:          "available",
+			}
+		}
+		// Bulk insert copies
+		for _, copy := range copies {
+			if _, err := s.repo.CreateBookCopy(copy); err != nil {
+				// optionally log error but continue
+				logrus.Error("Failed to create book copy: ", err)
+			}
 		}
 	}
 

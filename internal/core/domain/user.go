@@ -17,6 +17,8 @@ type User struct {
 	Email          string `gorm:"not null" json:"email"`
 	Gender         string `json:"gender"`
 	Level          string `json:"level"`
+	Batch          string `json:"batch"`
+	Section        string `json:"section"`
 	Image          string `json:"image"`
 	FullName       string `gorm:"column:full_name;not null" json:"full_name"`
 	ProgramID      string `json:"program_id"`
@@ -36,6 +38,8 @@ type UserRequest struct {
 	Email          string `json:"email"`
 	Gender         string `json:"gender"`
 	Level          string `json:"level"`
+	Batch          string `json:"batch"`
+	Section        string `json:"section"`
 	Image          string `json:"image"`
 	FullName       string `json:"full_name"`
 	ProgramID      string `json:"program_id"`
@@ -52,6 +56,8 @@ type UserListRequest struct {
 	MobileNumber   string `form:"mobile_number"`
 	Gender         string `json:"gender"`
 	Level          string `json:"level"`
+	Batch          string `json:"batch"`
+	Section        string `json:"section"`
 	EnrollmentYear string `form:"enrollment_year"`
 	Role           string `form:"role"`
 	Email          string `form:"email"`
@@ -68,6 +74,8 @@ type UserAllUpdateRequest struct {
 	MobileNumber   string `json:"mobile_number"`
 	Gender         string `json:"gender"`
 	Level          string `json:"level"`
+	Batch          string `json:"batch"`
+	Section        string `json:"section"`
 	EnrollmentYear string `json:"enrollment_year"`
 	Role           string `json:"role"`
 	Email          string `json:"email"`
@@ -94,6 +102,8 @@ type UserUpdateRequest struct {
 	Dob            time.Time `json:"dob"`
 	Gender         string    `json:"gender"`
 	Level          string    `json:"level"`
+	Batch          string    `json:"batch"`
+	Section        string    `json:"section"`
 	MobileNumber   string    `json:"mobile_number"`
 	EnrollmentYear time.Time `json:"enrollment_year"`
 	Role           string    `json:"role"`
@@ -111,6 +121,8 @@ type UserResponse struct {
 	Dob            string    `json:"dob"`
 	Gender         string    `json:"gender"`
 	Level          string    `json:"level"`
+	Batch          string    `json:"batch"`
+	Section        string    `json:"section"`
 	MobileNumber   string    `json:"mobile_number"`
 	EnrollmentYear string    `json:"enrollment_year"`
 	Role           string    `json:"role"`
@@ -130,6 +142,8 @@ type StudentResponse struct {
 	Role           string `json:"role"`
 	Gender         string `json:"gender"`
 	Level          string `json:"level"`
+	Batch          string `json:"batch"`
+	Section        string `json:"section"`
 	MobileNumber   string `json:"mobile_number"`
 	EnrollmentYear string `json:"enrollment_year"`
 	Email          string `json:"email"`
@@ -183,6 +197,27 @@ func (r *UserUpdateRequest) NewUpdate() Map {
 	}
 	if r.Role != "" {
 		return Map{"role": r.Role}
+	}
+	if r.Dob != (time.Time{}) {
+		return Map{"dob": r.Dob}
+	}
+	if r.Gender != "" {
+		return Map{"gender": r.Gender}
+	}
+	if r.Level != "" {
+		return Map{"level": r.Level}
+	}
+	if r.Batch != "" {
+		return Map{"batch": r.Batch}
+	}
+	if r.Section != "" {
+		return Map{"section": r.Section}
+	}
+	if r.MobileNumber != "" {
+		return Map{"mobile_number": r.MobileNumber}
+	}
+	if r.EnrollmentYear != (time.Time{}) {
+		return Map{"enrollment_year": r.EnrollmentYear}
 	}
 	if r.Email != "" {
 		return Map{"email": r.Email}

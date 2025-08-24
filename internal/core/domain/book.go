@@ -65,17 +65,20 @@ type BookCopyListRequest struct {
 }
 
 type BookRequest struct {
-	Title       string `json:"title"`
-	Author      string `json:"author"`
-	ISBN        string `json:"isbn"`
-	Publisher   string `json:"publisher"`
-	Edition     string `json:"edition,omitempty"`
-	CategoryID  string `json:"category_id"`
-	ProgramID   string `json:"program_id"`
-	TotalCopies uint   `json:"total_copies"`
-	TotalPages  uint   `json:"total_pages"`
-	Description string `json:"description"`
-	CoverImage  string `json:"cover_image"`
+	Title         string `json:"title"`
+	Author        string `json:"author"`
+	ISBN          string `json:"isbn"`
+	Publisher     string `json:"publisher"`
+	AccessionType string `json:"accession_type"`
+	StartValue    int    `json:"start_value"`
+	EndValue      int    `json:"end_value"`
+	Edition       string `json:"edition,omitempty"`
+	CategoryID    string `json:"category_id"`
+	ProgramID     string `json:"program_id"`
+	TotalCopies   uint   `json:"total_copies"`
+	TotalPages    uint   `json:"total_pages"`
+	Description   string `json:"description"`
+	CoverImage    string `json:"cover_image"`
 }
 
 type BookListRequest struct {
