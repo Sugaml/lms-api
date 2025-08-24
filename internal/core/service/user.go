@@ -9,6 +9,48 @@ import (
 	util "github.com/sugaml/lms-api/internal/core/utils"
 )
 
+func (s *Service) CreateBulkUser(data *[]domain.UserRequest) ([]*domain.UserResponse, error) {
+	var responses []*domain.UserResponse
+	for _, req := range *data {
+		err := req.Validate()
+		if err != nil {
+			return nil, err
+		}
+		data := domain.Convert[domain.UserRequest, domain.User](&req)
+		data.Password, err = util.HashPassword(data.Password)
+		if err != nil {
+			return nil, err
+		}
+		if data.Role == "student" {
+			studentExist, err := s.repo.GetStudentbyID(data.StudentID)
+			if studentExist != nil && err == nil {
+				return nil, errors.New("student already exist")
+			}
+		}
+		result, err := s.repo.CreateUser(data)
+		if err != nil {
+			return nil, err
+		}
+		s.repo.CreateNotification(&domain.Notification{
+			Title:    fmt.Sprintf("New student %s created.", result.Username),
+			UserID:   result.ID,
+			Module:   "user",
+			Action:   "create",
+			IsActive: true,
+		})
+		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
+			Title:    fmt.Sprintf("Created new student %s.", result.Username),
+			UserID:   &result.ID,
+			Action:   "create",
+			Data:     string(domain.ConvertToJson(result)),
+			IsActive: true,
+		})
+		logrus.Infof("Student %s created successfully", result.Username)
+		responses = append(responses, domain.Convert[domain.User, domain.UserResponse](result))
+	}
+	return responses, nil
+}
+
 // CreateUser creates a new User
 func (s *Service) CreateUser(req *domain.UserRequest) (*domain.UserResponse, error) {
 	err := req.Validate()

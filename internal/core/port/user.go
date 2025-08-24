@@ -19,6 +19,7 @@ type UserRepository interface {
 // type UserService interface is an interface for interacting with type Announcement-related data
 type UserService interface {
 	CreateUser(data *domain.UserRequest) (*domain.UserResponse, error)
+	CreateBulkUser(data *[]domain.UserRequest) ([]*domain.UserResponse, error)
 	LoginUser(req *domain.LoginRequest) (*domain.LoginUserResponse, error)
 	ListUser(req *domain.UserListRequest) ([]*domain.UserResponse, int64, error)
 	ListStudent(req *domain.UserListRequest) ([]*domain.StudentResponse, int64, error)

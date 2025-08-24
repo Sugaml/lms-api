@@ -123,6 +123,7 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	student := v1.Group("/students")
 	{
 		student.POST("", handler.CreateStudent)
+		student.POST("/bulk", handler.CreateBulkStudent)
 		student.GET("", handler.ListStudent)
 		student.GET("/:id", handler.GetUser)
 		student.GET("/:id/borrows", handler.GetStudntBorrow)
