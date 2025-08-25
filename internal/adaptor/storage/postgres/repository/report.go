@@ -453,7 +453,7 @@ func (r *Repository) GetInventorystats() (*domain.InventoryStats, error) {
 	r.db.Model(&domain.User{}).Where("role = ?", "student").Count(&totalStudents)
 	r.db.Model(&domain.User{}).Where("role = ? AND is_active = ?", "student", true).Count(&activeStudents)
 	r.db.Model(&domain.BorrowedBook{}).Where("status = ?", "pending").Count(&pendingRequests)
-	r.db.Model(&domain.Fine{}).Where("status = ?", "pending").Select("SUM(amount)").Scan(&totalFines)
+	// r.db.Model(&domain.Fine{}).Where("status = ?", "pending").Select("SUM(amount)").Scan(&totalFines)
 
 	// Available books = sum of all book copies - borrowed books
 	var availableBooks int64

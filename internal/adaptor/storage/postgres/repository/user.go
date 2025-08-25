@@ -41,7 +41,7 @@ func (r *Repository) ListStudent(req *domain.UserListRequest) ([]*domain.User, i
 	if req.FullName != "" {
 		f = f.Where("full_name ILIKE ?", "%"+req.FullName+"%")
 	}
-	if req.Program != "" {
+	if req.Program != "all" {
 		f = f.Where("program ILIKE ?", "%"+req.Program+"%")
 	}
 	if req.Dob != "" {
