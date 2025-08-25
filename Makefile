@@ -18,10 +18,10 @@ test:
 	go tool cover -func=cover.out
 
 build:
-	docker build --platform=linux/amd64 -t sugamdocker35/lms-api:v1.0.4 .
+	docker build --platform=linux/amd64 -t sugamdocker35/lms-api:v1.0.5 .
 
 push:
-	docker push sugamdocker35/lms-api:v1.0.4
+	docker push sugamdocker35/lms-api:v1.0.5
 
 swag:
 	swag init -g cmd/main.go -o ./docs --ot go --parseInternal true
