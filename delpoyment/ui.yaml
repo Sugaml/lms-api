@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: lms-ui
-          image: sugamdocker35/lms-ui:v1.0.3
+          image: sugamdocker35/lms-ui:v1.0.6
           ports:
             - containerPort: 80
           env:

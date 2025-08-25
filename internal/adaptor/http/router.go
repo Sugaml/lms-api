@@ -49,6 +49,8 @@ func NewRouter(config config.Config, handler Handler) (*Router, error) {
 	docs.SwaggerInfo.Host = config.HOST_PATH
 	v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.DefaultModelsExpandDepth(-1)))
 
+	v1.GET("/ping", handler.Ping)
+
 	user := v1.Group("/users")
 	{
 		user.POST("", handler.CreateUser)

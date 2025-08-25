@@ -19,6 +19,8 @@ spec:
         - name: lms-api
           image: sugamdocker35/lms-api:v1.0.2
           env:
+            - name: HTTP_PORT
+              value: "8080"
             - name: JWT_SECRET
               value: "my-1234433432qggag"
             - name: DB_AUTO_MIGRATE
@@ -42,11 +44,12 @@ metadata:
   name: lms-api
   namespace: lms
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: lms-api
   ports:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+      nodePort: 30080
 

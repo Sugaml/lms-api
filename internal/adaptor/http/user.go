@@ -9,6 +9,10 @@ import (
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
+func (h *Handler) Ping(ctx *gin.Context) {
+	SuccessResponse(ctx, "pong")
+}
+
 // AddUser			godoc
 // @Summary			Add a new User
 // @Description		Add a new User
