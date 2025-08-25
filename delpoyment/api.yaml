@@ -17,8 +17,10 @@ spec:
     spec:
       containers:
         - name: lms-api
-          image: sugamdocker35/lms-api:v1.0.1
+          image: sugamdocker35/lms-api:v1.0.2
           env:
+            - name: JWT_SECRET
+              value: "my-1234433432qggag"
             - name: DB_AUTO_MIGRATE
               value: "true"
             - name: DB_SOURCE
@@ -45,6 +47,6 @@ spec:
     app: lms-api
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080
       targetPort: 8080
 

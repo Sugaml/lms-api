@@ -5,6 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
+	util "github.com/sugaml/lms-api/internal/core/utils"
 	"gorm.io/gorm"
 )
 
@@ -26,6 +27,11 @@ func SeedUsers(db *gorm.DB) {
 		},
 	}
 	for _, user := range users {
+		pwd, err := util.HashPassword(user.Password)
+		if err != nil {
+			logrus.Error("Failed to seed user:", user, err)
+		}
+		user.Password = pwd
 		if err := db.FirstOrCreate(&user, domain.User{Username: user.Username, Password: user.Password, Role: user.Role}).Error; err != nil {
 			logrus.Error("Failed to seed user:", user, err)
 		}
