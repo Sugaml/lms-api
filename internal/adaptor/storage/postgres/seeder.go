@@ -13,19 +13,15 @@ func SeedUsers(db *gorm.DB) {
 		{
 			Username: "administrator",
 			Password: "administrator",
+			FullName: "Administrator",
 			Role:     "administrator",
 			IsActive: true,
 		},
 		{
 			Username: "librarian",
+			FullName: "Librarian",
 			Password: "librarian",
 			Role:     "librarian",
-			IsActive: true,
-		},
-		{
-			Username: "student",
-			Password: "student",
-			Role:     "student",
 			IsActive: true,
 		},
 	}
