@@ -18,8 +18,10 @@ test:
 	go tool cover -func=cover.out
 
 build:
-	docker build . -t aok-connect-notification
+	docker build --platform=linux/amd64 -t sugamdocker35/lms-api:v1.0.1 .
 
+push:
+	docker push sugamdocker35/lms-api:v1.0.1
 
 swag:
 	swag init -g cmd/main.go -o ./docs --ot go --parseInternal true
@@ -33,3 +35,4 @@ reload:
 
 extension:
 	CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
