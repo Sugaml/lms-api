@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
@@ -11,11 +12,23 @@ func (s *Service) Create(ctx context.Context, req *domain.CategoryRequest) (*dom
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
-	category.NewCategory(req)
-	category, err := s.repo.Create(ctx, category)
+	getUserID, err := getUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
+	category.NewCategory(req)
+	category, err = s.repo.Create(ctx, category)
+	if err != nil {
+		return nil, err
+	}
+
+	s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    fmt.Sprintf("Created %s Category", category.Name),
+		Action:   "create",
+		UserID:   &getUserID,
+		Data:     fmt.Sprint(category),
+		IsActive: true,
+	})
 	return category.CategoryResponse(), err
 }
 
@@ -40,8 +53,12 @@ func (s *Service) Get(ctx context.Context, id string) (*domain.CategoryResponse,
 }
 
 func (s *Service) Update(ctx context.Context, id string, req *domain.CategoryUpdateRequest) (*domain.CategoryResponse, error) {
+	getUserID, err := getUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	mp := req.NewUpdateRequest()
-	err := s.repo.Update(ctx, id, mp)
+	err = s.repo.Update(ctx, id, mp)
 	if err != nil {
 		return nil, err
 	}
@@ -49,13 +66,35 @@ func (s *Service) Update(ctx context.Context, id string, req *domain.CategoryUpd
 	if err != nil {
 		return nil, err
 	}
+	s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    fmt.Sprintf("Updated %s Category", category.Name),
+		Action:   "Update",
+		UserID:   &getUserID,
+		Data:     fmt.Sprint(category),
+		IsActive: true,
+	})
 	return category.CategoryResponse(), err
 }
 
 func (s *Service) Delete(ctx context.Context, id string) error {
-	err := s.repo.Delete(ctx, id)
+	getUserID, err := getUserID(ctx)
 	if err != nil {
 		return err
 	}
+	category, err := s.repo.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+	err = s.repo.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+	s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    fmt.Sprintf("Created %s Category", category.Name),
+		UserID:   &getUserID,
+		Action:   "create",
+		Data:     fmt.Sprint(category),
+		IsActive: true,
+	})
 	return nil
 }

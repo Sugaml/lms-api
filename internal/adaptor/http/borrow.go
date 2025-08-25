@@ -31,7 +31,7 @@ func (h *Handler) CreateBorrow(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
-	result, err := h.svc.CreateBorrow(req)
+	result, err := h.svc.CreateBorrow(ctx, req)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -62,7 +62,7 @@ func (h *Handler) ListBorrow(ctx *gin.Context) {
 		return
 	}
 	req.Prepare()
-	result, count, err := h.svc.ListBorrow(&req)
+	result, count, err := h.svc.ListBorrow(ctx, &req)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -88,7 +88,7 @@ func (h *Handler) GetBorrow(ctx *gin.Context) {
 	}
 	logrus.Info("Authorization user id: ", user_id)
 	id := ctx.Param("id")
-	result, err := h.svc.GetBorrow(id)
+	result, err := h.svc.GetBorrow(ctx, id)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -114,7 +114,7 @@ func (h *Handler) GetStudntBorrow(ctx *gin.Context) {
 	}
 	logrus.Info("Authorization user id: ", user_id)
 	id := ctx.Param("id")
-	result, err := h.svc.GetStudentsBorrowBook(id)
+	result, err := h.svc.GetStudentsBorrowBook(ctx, id)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -146,7 +146,7 @@ func (h *Handler) UpdateBorrow(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
-	data, err := h.svc.UpdateBorrow(id, req)
+	data, err := h.svc.UpdateBorrow(ctx, id, req)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -171,7 +171,7 @@ func (ch *Handler) DeleteBorrow(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, errors.New("required Borrow id"))
 		return
 	}
-	result, err := ch.svc.DeleteBorrow(id)
+	result, err := ch.svc.DeleteBorrow(ctx, id)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,8 +10,12 @@ import (
 )
 
 // CreateBorrowBook creates a new BorrowedBook
-func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.BorrowedBookResponse, error) {
+func (s *Service) CreateBorrow(ctx context.Context, req *domain.BorrowedBookRequest) (*domain.BorrowedBookResponse, error) {
 	err := req.Validate()
+	if err != nil {
+		return nil, err
+	}
+	_, err = getUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +82,7 @@ func (s *Service) CreateBorrow(req *domain.BorrowedBookRequest) (*domain.Borrowe
 }
 
 // ListBorrowedBooks retrieves a list of BorrowedBooks
-func (s *Service) ListBorrow(req *domain.ListBorrowedBookRequest) ([]*domain.BorrowedBookResponse, int64, error) {
+func (s *Service) ListBorrow(ctx context.Context, req *domain.ListBorrowedBookRequest) ([]*domain.BorrowedBookResponse, int64, error) {
 	var datas = []*domain.BorrowedBookResponse{}
 	results, count, err := s.repo.ListBorrow(req)
 	if err != nil {
@@ -90,7 +95,7 @@ func (s *Service) ListBorrow(req *domain.ListBorrowedBookRequest) ([]*domain.Bor
 	return datas, count, nil
 }
 
-func (s *Service) GetBorrow(id string) (*domain.BorrowedBookResponse, error) {
+func (s *Service) GetBorrow(ctx context.Context, id string) (*domain.BorrowedBookResponse, error) {
 	result, err := s.repo.GetBorrow(id)
 	if err != nil {
 		return nil, err
@@ -99,7 +104,7 @@ func (s *Service) GetBorrow(id string) (*domain.BorrowedBookResponse, error) {
 	return data, nil
 }
 
-func (s *Service) GetStudentsBorrowBook(id string) ([]*domain.BorrowedBookResponse, error) {
+func (s *Service) GetStudentsBorrowBook(ctx context.Context, id string) ([]*domain.BorrowedBookResponse, error) {
 	var datas = []*domain.BorrowedBookResponse{}
 	results, err := s.repo.GetBookBorrowByUserID(id)
 	if err != nil {
@@ -112,7 +117,7 @@ func (s *Service) GetStudentsBorrowBook(id string) ([]*domain.BorrowedBookRespon
 	return datas, nil
 }
 
-func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest) (*domain.BorrowedBookResponse, error) {
+func (s *Service) UpdateBorrow(ctx context.Context, id string, req *domain.UpdateBorrowedBookRequest) (*domain.BorrowedBookResponse, error) {
 	if id == "" {
 		return nil, errors.New("required borrow id")
 	}
@@ -196,7 +201,7 @@ func (s *Service) UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest)
 	return data, nil
 }
 
-func (s *Service) DeleteBorrow(id string) (*domain.BorrowedBookResponse, error) {
+func (s *Service) DeleteBorrow(ctx context.Context, id string) (*domain.BorrowedBookResponse, error) {
 	result, err := s.repo.GetBorrow(id)
 	if err != nil {
 		return nil, err

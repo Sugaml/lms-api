@@ -1,6 +1,8 @@
 package port
 
 import (
+	"context"
+
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
 
@@ -21,10 +23,10 @@ type BorrowRepository interface {
 
 // type BorrowService interface is an interface for interacting with type Announcement-related data
 type BorrowService interface {
-	CreateBorrow(data *domain.BorrowedBookRequest) (*domain.BorrowedBookResponse, error)
-	ListBorrow(req *domain.ListBorrowedBookRequest) ([]*domain.BorrowedBookResponse, int64, error)
-	GetStudentsBorrowBook(id string) ([]*domain.BorrowedBookResponse, error)
-	GetBorrow(id string) (*domain.BorrowedBookResponse, error)
-	UpdateBorrow(id string, req *domain.UpdateBorrowedBookRequest) (*domain.BorrowedBookResponse, error)
-	DeleteBorrow(id string) (*domain.BorrowedBookResponse, error)
+	CreateBorrow(ctx context.Context, data *domain.BorrowedBookRequest) (*domain.BorrowedBookResponse, error)
+	ListBorrow(ctx context.Context, req *domain.ListBorrowedBookRequest) ([]*domain.BorrowedBookResponse, int64, error)
+	GetStudentsBorrowBook(ctx context.Context, id string) ([]*domain.BorrowedBookResponse, error)
+	GetBorrow(ctx context.Context, id string) (*domain.BorrowedBookResponse, error)
+	UpdateBorrow(ctx context.Context, id string, req *domain.UpdateBorrowedBookRequest) (*domain.BorrowedBookResponse, error)
+	DeleteBorrow(ctx context.Context, id string) (*domain.BorrowedBookResponse, error)
 }
