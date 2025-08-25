@@ -27,7 +27,6 @@ func (r *Repository) ListBookCopies(req *domain.BookCopyListRequest) ([]*domain.
 	if req.Status != "" {
 		f = f.Where("status = ?", req.Status)
 	}
-
 	err := f.Count(&count).Preload("Book").
 		Order(req.SortColumn + " " + req.SortDirection).
 		Limit(req.Size).

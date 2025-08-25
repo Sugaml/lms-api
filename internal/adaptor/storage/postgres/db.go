@@ -54,6 +54,7 @@ func NewDB(config config.Config) (*gorm.DB, error) {
 		}
 		// db.Raw("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
 	}
+	db.Migrator().DropColumn(&domain.Book{}, "program_id")
 	// Seed initial data
 	SeedUsers(db)
 	SeedCategories(db)

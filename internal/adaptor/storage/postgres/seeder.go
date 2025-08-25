@@ -42,7 +42,9 @@ func SeedUsers(db *gorm.DB) {
 func SeedCategories(db *gorm.DB) {
 	categories := []string{
 		"Finance", "Marketing", "Management", "Economics",
-		"Accounting", "Operations", "Human Resources", "Information Technology",
+		"Accounting", "Operations", "Human Resources",
+		"Information Technology", "Communication",
+		"Information Systems", "Sales", "Statistics",
 	}
 
 	for _, name := range categories {

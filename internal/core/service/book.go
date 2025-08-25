@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
@@ -44,7 +43,7 @@ func (s *Service) CreateBook(ctx context.Context, req *domain.BookRequest) (*dom
 		for i := uint(0); i < result.TotalCopies; i++ {
 			copies[i] = &domain.BookCopy{
 				BookID:          result.ID,
-				AccessionNumber: fmt.Sprintf("%s-%03d", strings.ReplaceAll(result.ISBN, "-", ""), i+1),
+				AccessionNumber: fmt.Sprintf("%03d", i),
 				Status:          "available",
 			}
 		}

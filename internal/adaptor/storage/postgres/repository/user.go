@@ -38,6 +38,24 @@ func (r *Repository) ListStudent(req *domain.UserListRequest) ([]*domain.User, i
 	if req.Query != "" {
 		req.SortColumn = "score desc, " + req.SortColumn
 	}
+	if req.FullName != "" {
+		f = f.Where("full_name ILIKE ?", "%"+req.FullName+"%")
+	}
+	if req.Program != "" {
+		f = f.Where("program ILIKE ?", "%"+req.Program+"%")
+	}
+	if req.Dob != "" {
+		f = f.Where("dob = ?", req.Dob)
+	}
+	if req.StudentID != "" {
+		f = f.Where("student_id = ?", req.StudentID)
+	}
+	if req.Gender != "" {
+		f = f.Where("gender = ?", req.Gender)
+	}
+	if req.Username != "" {
+		f = f.Where("username = ?", req.Username)
+	}
 	err := f.Count(&count).
 		Order(req.SortColumn + " " + req.SortDirection).
 		Limit(req.Size).

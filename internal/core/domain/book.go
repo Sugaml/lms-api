@@ -13,14 +13,12 @@ type Book struct {
 	Publisher   string    `gorm:"type:varchar(255);null" json:"publisher"`
 	Edition     string    `gorm:"type:varchar(100)" json:"edition,omitempty"`
 	CategoryID  string    `gorm:"not null" json:"category_id"`
-	ProgramID   string    `gorm:"type:varchar(100);not null" json:"program_id"`
 	Description string    `gorm:"type:text" json:"description"`
 	CoverImage  string    `gorm:"type:text" json:"cover_image,omitempty"`
 	TotalPages  uint      `json:"total_pages"`
 	TotalCopies uint      `gorm:"not null;default:1" json:"total_copies"`
 	IsActive    bool      `gorm:"default:true" json:"is_active"`
 	Category    *Category `gorm:"foreignkey:ID;references:CategoryID" json:"category,omitempty"`
-	Program     *Program  `gorm:"foreignkey:ID;references:ProgramID" json:"program,omitempty"`
 	// Relations
 	Copies []BookCopy `gorm:"foreignKey:BookID" json:"copies,omitempty"`
 }
@@ -81,7 +79,6 @@ type BookRequest struct {
 	EndValue      int    `json:"end_value"`
 	Edition       string `json:"edition,omitempty"`
 	CategoryID    string `json:"category_id"`
-	ProgramID     string `json:"program_id"`
 	TotalCopies   uint   `json:"total_copies"`
 	TotalPages    uint   `json:"total_pages"`
 	Description   string `json:"description"`
@@ -156,9 +153,6 @@ func (r *BookRequest) Validate() error {
 	}
 	if r.Author == "" {
 		return errors.New("author is required")
-	}
-	if r.ISBN == "" {
-		return errors.New("isbn is required")
 	}
 	return nil
 }
