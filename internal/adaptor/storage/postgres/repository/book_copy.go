@@ -24,6 +24,9 @@ func (r *Repository) ListBookCopies(req *domain.BookCopyListRequest) ([]*domain.
 	if req.BookID != "" {
 		f = f.Where("book_id = ?", req.BookID)
 	}
+	if req.AccessionNumber != "" {
+		f = f.Where("accession_number = ?", req.AccessionNumber)
+	}
 	if req.Status != "" {
 		f = f.Where("status = ?", req.Status)
 	}

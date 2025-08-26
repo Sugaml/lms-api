@@ -110,7 +110,10 @@ func (s *Service) UpdateBook(ctx context.Context, id string, req *domain.BookUpd
 	if err != nil {
 		return nil, err
 	}
-
+	getUserID, err := getUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// update
 	mp := req.NewUpdate()
 	result, err := s.repo.UpdateBook(id, mp)
@@ -123,12 +126,14 @@ func (s *Service) UpdateBook(ctx context.Context, id string, req *domain.BookUpd
 		Type:        "book",
 		Action:      "update",
 		Module:      "book",
+		UserID:      getUserID,
 		IsActive:    true,
 	})
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("Updated %s Book details.", result.Title),
 		Action:   "update",
 		Data:     fmt.Sprint(req),
+		UserID:   &getUserID,
 		IsActive: true,
 	})
 	data := domain.Convert[domain.Book, domain.BookResponse](result)
@@ -137,6 +142,10 @@ func (s *Service) UpdateBook(ctx context.Context, id string, req *domain.BookUpd
 
 func (s *Service) DeleteBook(ctx context.Context, id string) (*domain.BookResponse, error) {
 	result, err := s.repo.GetBook(id)
+	if err != nil {
+		return nil, err
+	}
+	getUserID, err := getUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +164,7 @@ func (s *Service) DeleteBook(ctx context.Context, id string) (*domain.BookRespon
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("Deleted %s parking area.", result.Title),
 		Action:   "delete",
+		UserID:   &getUserID,
 		Data:     fmt.Sprint(result),
 		IsActive: true,
 	})

@@ -424,11 +424,11 @@ func (r *Repository) GetBorrowedBookStats() (*domain.BorrowedBookStats, error) {
 
 func (r *Repository) GetBookProgramstats() (*[]domain.BookProgramstats, error) {
 	var stats []domain.BookProgramstats
-	// Assuming BookProgramStats has ProgramID, ProgramName, and Count fields
-	if err := r.db.Model(&domain.Book{}).
-		Select("programs.id as program_id, programs.name as program_name, count(books.id) as count").
-		Joins("left join programs on programs.id = books.program_id").
-		Group("programs.id, programs.name").
+
+	if err := r.db.Model(&domain.User{}).
+		Select("program as program_name, count(*) as count").
+		Where("role = ?", "student").
+		Group("program").
 		Scan(&stats).Error; err != nil {
 		return nil, err
 	}

@@ -96,7 +96,11 @@ func (s *Service) UpdateBookCopy(ctx context.Context, id string, req *domain.Boo
 	if id == "" {
 		return nil, errors.New("required BookCopy id")
 	}
-	_, err := s.repo.GetBookCopy(id)
+	getUserID, err := getUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.repo.GetBookCopy(id)
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +114,7 @@ func (s *Service) UpdateBookCopy(ctx context.Context, id string, req *domain.Boo
 	_, _ = s.repo.CreateNotification(&domain.Notification{
 		Title:       fmt.Sprintf("Updated copy %s of BookID %s", result.AccessionNumber, result.BookID),
 		Description: "update",
+		UserID:      getUserID,
 		Type:        "book_copy",
 		Action:      "update",
 		Module:      "book_copy",
@@ -118,6 +123,7 @@ func (s *Service) UpdateBookCopy(ctx context.Context, id string, req *domain.Boo
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("Updated copy %s of BookID %s", result.AccessionNumber, result.BookID),
 		Action:   "update",
+		UserID:   &getUserID,
 		Data:     fmt.Sprint(req),
 		IsActive: true,
 	})
@@ -130,7 +136,10 @@ func (s *Service) DeleteBookCopy(ctx context.Context, id string) (*domain.BookCo
 	if err != nil {
 		return nil, err
 	}
-
+	getUserID, err := getUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// Optional: check if this copy is currently issued
 	borrowedCount, err := s.repo.CountBorrowedCopyID(id)
 	if err != nil {
@@ -148,6 +157,7 @@ func (s *Service) DeleteBookCopy(ctx context.Context, id string) (*domain.BookCo
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("Deleted copy %s of BookID %s", result.AccessionNumber, result.BookID),
 		Action:   "delete",
+		UserID:   &getUserID,
 		Data:     fmt.Sprint(result),
 		IsActive: true,
 	})

@@ -18,6 +18,8 @@ type Book struct {
 	TotalPages  uint      `json:"total_pages"`
 	TotalCopies uint      `gorm:"not null;default:1" json:"total_copies"`
 	IsActive    bool      `gorm:"default:true" json:"is_active"`
+	Keywords    string    `json:"keywords"`
+	Tags        string    `json:"tags"`
 	Category    *Category `gorm:"foreignkey:ID;references:CategoryID" json:"category,omitempty"`
 	// Relations
 	Copies []BookCopy `gorm:"foreignKey:BookID" json:"copies,omitempty"`
@@ -29,18 +31,22 @@ type BookCopy struct {
 	AccessionNumber string `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
 	Status          string `gorm:"type:varchar(20);not null;default:'available'" json:"status"`
 	Book            *Book  `gorm:"foreignkey:ID;references:BookID" json:"book,omitempty"`
+	Labels          string `json:"labels"`
+	Remarks         string `json:"remarks"`
 	// Relations
 	BorrowedBooks []BorrowedBook `gorm:"foreignKey:BookCopyID" json:"borrowed_books,omitempty"`
 }
 
 type AddBookCopiesRequest struct {
 	BookID               string `json:"book_id"`
+	Remarks              string `json:"remarks"`
 	AddCopies            uint   `json:"add_copies"`
 	StartAccessionNumber uint   `json:"start_accession_number"`
 	EndAccessionNumber   uint   `json:"end_accession_number"`
 }
 
 type BookCopyRequest struct {
+	Remarks         string `json:"remarks"`
 	BookID          string `gorm:"not null" json:"book_id"` // FK to Book
 	AccessionNumber string `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
 	Status          string `gorm:"type:varchar(20);not null;default:'available'" json:"status"`
@@ -49,6 +55,7 @@ type BookCopyRequest struct {
 type BookCopyUpdateRequest struct {
 	BookID          string `gorm:"not null" json:"book_id"` // FK to Book
 	AccessionNumber string `gorm:"type:varchar(50);unique;not null" json:"accession_number"`
+	Remarks         string `json:"remarks"`
 	Status          string `gorm:"type:varchar(20);not null;default:'available'" json:"status"`
 }
 
@@ -58,6 +65,7 @@ type BookCopyResponse struct {
 	BookID          string        `json:"book_id"` // FK to Book
 	AccessionNumber string        `json:"accession_number"`
 	Status          string        `json:"status"`
+	Remarks         string        `json:"remarks"`
 	Book            *BookResponse `json:"book,omitempty"`
 	// Relations
 	BorrowedBooks []BorrowedBookResponse `json:"borrowed_books,omitempty"`
@@ -65,14 +73,17 @@ type BookCopyResponse struct {
 
 type BookCopyListRequest struct {
 	ListRequest
-	BookID string `form:"book_id"`
-	Status string `form:"status"` // available, issued, reserved
+	BookID          string `form:"book_id"`
+	AccessionNumber string `form:"accession_number"`
+	Status          string `form:"status"` // available, issued, reserved
 }
 
 type BookRequest struct {
 	Title         string `json:"title"`
 	Author        string `json:"author"`
 	ISBN          string `json:"isbn"`
+	Keywords      string `json:"keywords"`
+	Tags          string `json:"tags"`
 	Publisher     string `json:"publisher"`
 	AccessionType string `json:"accession_type"`
 	StartValue    int    `json:"start_value"`
@@ -104,6 +115,8 @@ type BookUpdateRequest struct {
 	Author      *string `json:"author"`
 	ISBN        *string `json:"isbn"`
 	Publisher   *string `json:"publisher"`
+	Keywords    string  `json:"keywords"`
+	Tags        string  `json:"tags"`
 	Edition     *string `json:"edition,omitempty"`
 	Category    *string `json:"category"`
 	Program     *string `json:"program"`
@@ -135,6 +148,8 @@ type BookResponse struct {
 	ISBN            string             `json:"isbn"`
 	Publisher       string             `json:"publisher"`
 	Edition         string             `json:"edition"`
+	Keywords        string             `json:"keywords"`
+	Tags            string             `json:"tags"`
 	ProgramID       string             `json:"program_id"`
 	CategoryID      string             `json:"category_id"`
 	Program         ProgramResponse    `json:"program"`
@@ -170,6 +185,12 @@ func (r *BookUpdateRequest) NewUpdate() Map {
 	}
 	if r.Publisher != nil {
 		mp["publisher"] = *r.Publisher
+	}
+	if r.Keywords != "" {
+		mp["keywords"] = r.Keywords
+	}
+	if r.Tags != "" {
+		mp["tags"] = r.Tags
 	}
 	if r.Edition != nil {
 		mp["edition"] = *r.Edition

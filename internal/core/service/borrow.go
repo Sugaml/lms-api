@@ -15,7 +15,7 @@ func (s *Service) CreateBorrow(ctx context.Context, req *domain.BorrowedBookRequ
 	if err != nil {
 		return nil, err
 	}
-	_, err = getUserID(ctx)
+	getUserID, err := getUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -48,14 +48,14 @@ func (s *Service) CreateBorrow(ctx context.Context, req *domain.BorrowedBookRequ
 		}
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 			Title:    fmt.Sprintf("Book %s Accession Number %s has been issued to %s", bookCopy.Book.Title, bookCopy.AccessionNumber, user.FullName),
-			UserID:   &result.ID,
+			UserID:   &getUserID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
 			IsActive: true,
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 			Title:    fmt.Sprintf("%s book has %s to %s", bookCopy.Book.Title, result.Status, user.FullName),
-			UserID:   &result.ID,
+			UserID:   &getUserID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
 			IsActive: true,
@@ -65,14 +65,14 @@ func (s *Service) CreateBorrow(ctx context.Context, req *domain.BorrowedBookRequ
 		data.Status = "requested"
 		s.repo.CreateNotification(&domain.Notification{
 			Title:    fmt.Sprintf("%s book has %s by %s", bookCopy.Book.Title, data.Status, user.FullName),
-			UserID:   user.ID,
+			UserID:   getUserID,
 			Module:   "borrow",
 			Action:   "borrow",
 			IsActive: true,
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 			Title:    fmt.Sprintf("%s book has %s by %s", bookCopy.Book.Title, result.Status, user.FullName),
-			UserID:   &result.ID,
+			UserID:   &getUserID,
 			Action:   "create",
 			Data:     fmt.Sprint(req),
 			IsActive: true,
@@ -125,7 +125,10 @@ func (s *Service) UpdateBorrow(ctx context.Context, id string, req *domain.Updat
 	if err != nil {
 		return nil, err
 	}
-
+	getUserID, err := getUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	bookCopy, err := s.repo.GetBookCopy(borrow.BookCopyID)
 	if err != nil {
 		return nil, err
@@ -149,7 +152,7 @@ func (s *Service) UpdateBorrow(ctx context.Context, id string, req *domain.Updat
 		}
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 			Title:    fmt.Sprintf("Book %s Accession Number %s has been issued to %s", bookCopy.Book.Title, bookCopy.AccessionNumber, user.FullName),
-			UserID:   &result.ID,
+			UserID:   &getUserID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
 			IsActive: true,
@@ -163,7 +166,7 @@ func (s *Service) UpdateBorrow(ctx context.Context, id string, req *domain.Updat
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 			Title:    fmt.Sprintf("%s book has %s to %s", bookCopy.Book.Title, result.Status, user.FullName),
-			UserID:   &result.ID,
+			UserID:   &getUserID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
 			IsActive: true,
@@ -177,7 +180,7 @@ func (s *Service) UpdateBorrow(ctx context.Context, id string, req *domain.Updat
 		}
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 			Title:    fmt.Sprintf("Book %s Accession Number %s has been available", bookCopy.Book.Title, bookCopy.AccessionNumber),
-			UserID:   &result.ID,
+			UserID:   &getUserID,
 			Action:   "issue",
 			Data:     fmt.Sprint(req),
 			IsActive: true,
@@ -191,7 +194,7 @@ func (s *Service) UpdateBorrow(ctx context.Context, id string, req *domain.Updat
 		})
 		_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 			Title:    fmt.Sprintf("%s book has %s by %s", bookCopy.Book.Title, result.Status, user.FullName),
-			UserID:   &result.ID,
+			UserID:   &getUserID,
 			Action:   "update",
 			Data:     fmt.Sprint(req),
 			IsActive: true,
@@ -203,6 +206,10 @@ func (s *Service) UpdateBorrow(ctx context.Context, id string, req *domain.Updat
 
 func (s *Service) DeleteBorrow(ctx context.Context, id string) (*domain.BorrowedBookResponse, error) {
 	result, err := s.repo.GetBorrow(id)
+	if err != nil {
+		return nil, err
+	}
+	getUserID, err := getUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +226,7 @@ func (s *Service) DeleteBorrow(ctx context.Context, id string) (*domain.Borrowed
 	})
 	_, _ = s.repo.CreateAuditLog(&domain.AuditLog{
 		Title:    fmt.Sprintf("%s book has been deleted by %s", result.BookCopy.Book.Title, result.Student.FullName),
-		UserID:   &result.ID,
+		UserID:   &getUserID,
 		Action:   "delete",
 		Data:     fmt.Sprint(result),
 		IsActive: true,

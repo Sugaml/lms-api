@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/sugaml/lms-api/internal/core/domain"
 )
@@ -57,17 +58,39 @@ func (s *Service) UpdateProgram(ctx context.Context, id string, req *domain.Prog
 	if err != nil {
 		return nil, err
 	}
+	getUserID, err := getUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	Program, err := s.repo.GetProgram(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+	s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    "Program updated",
+		Action:   "update",
+		UserID:   &getUserID,
+		Data:     fmt.Sprint(id),
+		IsActive: true,
+	})
 	return Program.ProgramResponse(), err
 }
 
 func (s *Service) DeleteProgram(ctx context.Context, id string) error {
-	err := s.repo.DeleteProgram(ctx, id)
+	getUserID, err := getUserID(ctx)
 	if err != nil {
 		return err
 	}
+	err = s.repo.DeleteProgram(ctx, id)
+	if err != nil {
+		return err
+	}
+	s.repo.CreateAuditLog(&domain.AuditLog{
+		Title:    "Program deleted",
+		Action:   "delete",
+		UserID:   &getUserID,
+		Data:     fmt.Sprint(id),
+		IsActive: true,
+	})
 	return nil
 }

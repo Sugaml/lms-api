@@ -41,7 +41,7 @@ func (req *ListRequest) Prepare() {
 		req.SortColumn = "created_at"
 	}
 	if req.SortDirection == "" {
-		req.SortDirection = "desc"
+		req.SortDirection = "asc"
 	}
 	endDate := time.Now()
 	startDate := endDate.AddDate(0, -1, 0)
