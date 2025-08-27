@@ -7,9 +7,9 @@ import (
 
 type Book struct {
 	BaseModel
-	Title       string    `gorm:"type:varchar(255);not null" json:"title"`
-	Author      string    `gorm:"type:varchar(255);not null" json:"author"`
-	ISBN        string    `gorm:"type:varchar(20);unique;not null" json:"isbn"`
+	Title  string `gorm:"type:varchar(255);not null" json:"title"`
+	Author string `gorm:"type:varchar(255);not null" json:"author"`
+	// ISBN        string    `gorm:"type:varchar(20);null" json:"isbn"`
 	Publisher   string    `gorm:"type:varchar(255);null" json:"publisher"`
 	Edition     string    `gorm:"type:varchar(100)" json:"edition,omitempty"`
 	CategoryID  string    `gorm:"not null" json:"category_id"`

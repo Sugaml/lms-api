@@ -97,21 +97,21 @@ type LoginUserResponse struct {
 }
 
 type UserUpdateRequest struct {
-	Username       string    `json:"username"`
-	Password       string    `json:"password"`
-	Dob            time.Time `json:"dob"`
-	Gender         string    `json:"gender"`
-	Level          string    `json:"level"`
-	Batch          string    `json:"batch"`
-	Section        string    `json:"section"`
-	MobileNumber   string    `json:"mobile_number"`
-	EnrollmentYear time.Time `json:"enrollment_year"`
-	Role           string    `json:"role"`
-	Image          string    `json:"image"`
-	Email          string    `json:"email"`
-	FullName       string    `json:"full_name"`
-	Program        string    `json:"program"`
-	StudentID      string    `json:"student_id"`
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	Dob            string `json:"dob"`
+	Gender         string `json:"gender"`
+	Level          string `json:"level"`
+	Batch          string `json:"batch"`
+	Section        string `json:"section"`
+	MobileNumber   string `json:"mobile_number"`
+	EnrollmentYear string `json:"enrollment_year"`
+	Role           string `json:"role"`
+	Image          string `json:"image"`
+	Email          string `json:"email"`
+	FullName       string `json:"full_name"`
+	Program        string `json:"program"`
+	StudentID      string `json:"student_id"`
 }
 
 type UserResponse struct {
@@ -198,7 +198,7 @@ func (r *UserUpdateRequest) NewUpdate() Map {
 	if r.Role != "" {
 		return Map{"role": r.Role}
 	}
-	if r.Dob != (time.Time{}) {
+	if r.Dob != "" {
 		return Map{"dob": r.Dob}
 	}
 	if r.Gender != "" {
@@ -216,7 +216,7 @@ func (r *UserUpdateRequest) NewUpdate() Map {
 	if r.MobileNumber != "" {
 		return Map{"mobile_number": r.MobileNumber}
 	}
-	if r.EnrollmentYear != (time.Time{}) {
+	if r.EnrollmentYear != "" {
 		return Map{"enrollment_year": r.EnrollmentYear}
 	}
 	if r.Email != "" {
