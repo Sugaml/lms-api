@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/sugaml/lms-api/internal/core/domain"
@@ -22,6 +23,7 @@ func (s *Service) CreateBulkUser(data *[]domain.UserRequest) ([]*domain.UserResp
 			return nil, err
 		}
 		if data.Role == "student" {
+			data.Username = strings.ToLower(data.Username) + "." + data.StudentID
 			studentExist, err := s.repo.GetStudentbyID(data.StudentID)
 			if studentExist != nil && err == nil {
 				return nil, errors.New("student already exist")
@@ -63,6 +65,7 @@ func (s *Service) CreateUser(req *domain.UserRequest) (*domain.UserResponse, err
 		return nil, err
 	}
 	if data.Role == "student" {
+		data.Username = strings.ToLower(data.Username) + "." + data.StudentID
 		studentExist, err := s.repo.GetStudentbyID(data.StudentID)
 		if studentExist != nil && err == nil {
 			return nil, errors.New("student already exist")
