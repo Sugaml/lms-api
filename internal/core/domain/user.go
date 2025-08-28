@@ -186,47 +186,48 @@ func (u *UserRequest) Validate() error {
 }
 
 func (r *UserUpdateRequest) NewUpdate() Map {
+	mp := map[string]interface{}{}
 	if r.Username != "" {
-		return Map{"username": r.Username}
+		mp["username"] = r.Username
 	}
 	if r.Image != "" {
-		return Map{"image": r.Image}
+		mp["image"] = r.Image
 	}
 	if r.Password != "" {
-		return Map{"password": r.Password}
+		mp["password"] = r.Password
 	}
 	if r.Role != "" {
-		return Map{"role": r.Role}
+		mp["role"] = r.Role
 	}
 	if r.Dob != "" {
-		return Map{"dob": r.Dob}
+		mp["dob"] = r.Dob
 	}
 	if r.Gender != "" {
-		return Map{"gender": r.Gender}
+		mp["gender"] = r.Gender
 	}
 	if r.Level != "" {
-		return Map{"level": r.Level}
+		mp["level"] = r.Level
 	}
 	if r.Batch != "" {
-		return Map{"batch": r.Batch}
+		mp["batch"] = r.Batch
 	}
 	if r.Section != "" {
-		return Map{"section": r.Section}
+		mp["section"] = r.Section
 	}
 	if r.MobileNumber != "" {
-		return Map{"mobile_number": r.MobileNumber}
+		mp["mobile_number"] = r.MobileNumber
 	}
 	if r.EnrollmentYear != "" {
-		return Map{"enrollment_year": r.EnrollmentYear}
+		mp["enrollment_year"] = r.EnrollmentYear
 	}
 	if r.Email != "" {
-		return Map{"email": r.Email}
+		mp["email"] = r.Email
 	}
 	if r.FullName != "" {
-		return Map{"full_name": r.FullName}
+		mp["full_name"] = r.FullName
 	}
 	if r.Program != "" {
-		return Map{"program": r.Program}
+		mp["program"] = r.Program
 	}
-	return nil
+	return mp
 }

@@ -15,7 +15,7 @@ services:
       - "5432:5432"
 
   lms-api:
-    image: sugamdocker35/lms-api:v2.0.0
+    image: sugamdocker35/lms-api:v2.0.5
     container_name: lms-api
     depends_on:
       - postgres
@@ -36,7 +36,7 @@ services:
           memory: 128M
 
   lms-ui:
-    image: sugamdocker35/lms-ui:v2.0.0
+    image: sugamdocker35/lms-ui:v2.0.2
     container_name: lms-ui
     depends_on:
       - lms-api
