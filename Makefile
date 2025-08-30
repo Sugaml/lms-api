@@ -1,5 +1,5 @@
 postgres:
-	docker run --name postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:15.2
+	docker run --name postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret --restart=always -d postgres:15.2
 
 createdb:
 	docker exec -it postgres createdb --username=root --owner=root parking
@@ -41,3 +41,11 @@ up:
 
 down:
 	docker-compose down
+
+#Check Docker Desktop disk usage
+chec-usage:
+	docker system df 
+
+#Delete build cache (safe, biggest gain):
+build-cache:
+	docker builder prune -af
