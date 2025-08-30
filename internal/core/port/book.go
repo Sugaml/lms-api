@@ -18,6 +18,7 @@ type BookRepository interface {
 type BookCopyRepository interface {
 	CreateBookCopy(copy *domain.BookCopy) (*domain.BookCopy, error)
 	ListBookCopies(req *domain.BookCopyListRequest) ([]*domain.BookCopy, int64, error)
+	IsBookCopiesByBookId(bookId string) (bool, error)
 	ListBookCopiesByBookId(bookId string, req *domain.BookCopyListRequest) ([]*domain.BookCopy, int64, error)
 	GetBookCopy(id string) (*domain.BookCopy, error)
 	CountBorrowedCopyID(bookCopyID string) (int64, error)

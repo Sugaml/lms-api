@@ -8,6 +8,7 @@ import (
 type BorrowedBook struct {
 	BaseModel
 	UserID       string     `gorm:"not null" json:"user_id"`
+	BookID       string     `json:"book_id"`
 	BookCopyID   string     `gorm:"not null" json:"book_copy_id"` // FK to BookCopy
 	LibrarianID  string     `json:"librarian_id"`
 	BorrowedDate time.Time  `gorm:"column:borrowed_date" json:"borrowed_date"`

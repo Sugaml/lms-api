@@ -149,6 +149,13 @@ func (s *Service) DeleteBook(ctx context.Context, id string) (*domain.BookRespon
 	if err != nil {
 		return nil, err
 	}
+	copyExists, err := s.repo.IsBookCopiesByBookId(id)
+	if err != nil {
+		return nil, err
+	}
+	if copyExists {
+		return nil, fmt.Errorf("book has copies cannot delete it")
+	}
 	CountBorrwedCopiesBookID, err := s.repo.CountBorrwedCopiesBookID(id)
 	if err != nil {
 		return nil, err

@@ -35,6 +35,7 @@ func (s *Service) CreateBorrow(ctx context.Context, req *domain.BorrowedBookRequ
 	if data.Status == "" {
 		data.Status = "pending"
 	}
+	data.BookID = bookCopy.BookID
 	data.IsActive = true
 	result, err := s.repo.CreateBorrow(data)
 	if err != nil {

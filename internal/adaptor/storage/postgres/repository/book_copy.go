@@ -41,6 +41,14 @@ func (r *Repository) ListBookCopies(req *domain.BookCopyListRequest) ([]*domain.
 	return copies, count, nil
 }
 
+func (r *Repository) IsBookCopiesByBookId(bookId string) (bool, error) {
+	var count int64
+	if err := r.db.Model(&domain.BookCopy{}).Where("book_id = ?", bookId).Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (r *Repository) ListBookCopiesByBookId(bookId string, req *domain.BookCopyListRequest) ([]*domain.BookCopy, int64, error) {
 	var copies []*domain.BookCopy
 	var count int64

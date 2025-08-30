@@ -14,12 +14,14 @@ func SeedUsers(db *gorm.DB) {
 		{
 			Username: "administrator",
 			Password: "administrator",
+			Email:    "administrator@gmail.com",
 			FullName: "Administrator",
 			Role:     "administrator",
 			IsActive: true,
 		},
 		{
 			Username: "librarian",
+			Email:    "librarian@gmail.com",
 			FullName: "Librarian",
 			Password: "librarian",
 			Role:     "librarian",
@@ -32,7 +34,7 @@ func SeedUsers(db *gorm.DB) {
 			logrus.Error("Failed to seed user:", user, err)
 		}
 		user.Password = pwd
-		if err := db.FirstOrCreate(&user, domain.User{Username: user.Username, Password: user.Password, Role: user.Role}).Error; err != nil {
+		if err := db.FirstOrCreate(&user, domain.User{Username: user.Username, Email: user.Email, Password: user.Password, Role: user.Role}).Error; err != nil {
 			logrus.Error("Failed to seed user:", user, err)
 		}
 	}
